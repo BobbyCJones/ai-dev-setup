@@ -27,7 +27,72 @@ For Cursor: open this folder, launch Composer (`Ctrl+I`), and send the same prom
 
 **Manual:**
 
-See [mise-setup.md](mise-setup.md) for step-by-step instructions.
+```powershell
+.\install-dev-tools.ps1
+```
+
+See [mise-setup.md](mise-setup.md) for the detailed walkthrough and verification steps.
+
+## Global Machine Setup
+
+Run this once per machine from this repo:
+
+```powershell
+.\install-dev-tools.ps1
+```
+
+What the installer does globally:
+
+1. Installs `mise` if it is not already present.
+2. Installs the CLI tools declared in [mise.toml](mise.toml) so they are available in any terminal.
+3. Installs a repo-owned global mise fragment under `%APPDATA%\\mise\\conf.d`.
+4. Copies managed shell snippets to `%USERPROFILE%\\.ai-dev-setup`.
+5. Adds one include block to PowerShell profiles and `~/.bashrc` so shell activation works automatically.
+6. Configures conservative global git defaults, including `delta` for syntax-highlighted diffs when available.
+
+After installation, open a new shell and verify:
+
+```bash
+mise list
+rg --version
+delta --version
+gh auth status
+```
+
+Result: the toolchain is installed and configured globally for your user account. New terminals should have the managed shell integration and globally installed tools available without additional setup in this repo.
+
+## Project Repo Setup
+
+The machine-level setup gives you the shared toolchain globally. Individual project repos still need their own runtime and environment configuration.
+
+In each project repo:
+
+1. Add a `mise.toml` at the repo root to pin the runtimes that project needs.
+2. Run `mise install` in that repo to install the versions declared there.
+3. Add a `.envrc` for project-local environment variables, then run `direnv allow`.
+4. Commit a `.envrc.example` template and add `.envrc` to `.gitignore`.
+5. Optionally add `AGENTS.md` or `CLAUDE.md` for project-specific agent instructions.
+
+Example project `mise.toml`:
+
+```toml
+[tools]
+node   = "20"
+python = "3.12"
+```
+
+Example project onboarding flow:
+
+```bash
+git clone <repo>
+cd <repo>
+cp .envrc.example .envrc
+# fill in .envrc with real values
+direnv allow
+mise install
+```
+
+See [project-setup.md](project-setup.md) for the fuller per-project template and examples.
 
 ## What This Sets Up
 
@@ -50,6 +115,10 @@ All tools are installed globally via [mise](https://mise.jdx.dev) and available 
 | [jq](https://jqlang.github.io/jq/) | `grep`/`awk` on JSON | JSON parsing and transformation from the command line |
 | [yq](https://github.com/mikefarah/yq) | — | YAML, TOML, and XML — same query syntax as `jq` |
 | [gh](https://cli.github.com/) | `curl` to GitHub API | PRs, issues, CI status, releases — all GitHub operations |
+| [mlr](https://miller.readthedocs.io/) (miller) | `awk`/`cut` on CSV | CSV and TSV processing — same pipeline design as `jq` |
+| [sg](https://ast-grep.github.io/) (ast-grep) | `rg` for code patterns | Structural code search and replace using AST patterns, not text |
+| [shellcheck](https://www.shellcheck.net/) | — | Lints shell scripts; catches portability bugs and common mistakes |
+| [shfmt](https://github.com/mvdan/sh) | — | Formats shell scripts consistently |
 | [bat](https://github.com/sharkdp/bat) | `cat` | File display with syntax highlighting and line numbers |
 | [eza](https://github.com/eza-community/eza) | `ls` | Directory listings with git status per file |
 | [fzf](https://github.com/junegunn/fzf) | — | Interactive fuzzy selection from any list |

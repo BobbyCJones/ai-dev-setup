@@ -11,6 +11,16 @@ These tools are installed globally via mise. Use them instead of fallbacks.
 
 - **jq** — use for all JSON parsing and transformation. Never parse JSON with `grep`, `sed`, or `awk`.
 - **yq** — use for YAML, TOML, and XML. Same query syntax as `jq`.
+- **mlr** (miller) — use for CSV and TSV data. Same pipeline-friendly design as `jq`. Never parse tabular data with `awk` or `cut`.
+
+## Code Search & Refactoring
+
+- **sg** (ast-grep) — use for structural code search and replace. Prefer over `rg` when matching code patterns (function calls, imports, type usage) where text search would be too broad or fragile.
+
+## Shell Script Quality
+
+- **shellcheck** — lint any shell script before considering it done. Run `shellcheck <script.sh>` and resolve all warnings.
+- **shfmt** — format shell scripts with `shfmt -w <script.sh>`. Run after writing or editing any shell script.
 
 ## GitHub
 
