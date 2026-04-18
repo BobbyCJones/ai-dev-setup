@@ -39,6 +39,24 @@ See [mise-setup.md](mise-setup.md) for step-by-step instructions.
 | [project-setup.md](project-setup.md) | What to add to each project repo |
 | [agent-tools.md](agent-tools.md) | Optional template for global agent instructions |
 
+## Installed Tools
+
+All tools are installed globally via [mise](https://mise.jdx.dev) and available in any terminal.
+
+| Tool | Replaces | What it does |
+|------|----------|--------------|
+| [rg](https://github.com/BurntSushi/ripgrep) (ripgrep) | `grep` | Fast file content search; respects `.gitignore` automatically |
+| [fd](https://github.com/sharkdp/fd) | `find` | Simple, fast file discovery; respects `.gitignore` |
+| [jq](https://jqlang.github.io/jq/) | `grep`/`awk` on JSON | JSON parsing and transformation from the command line |
+| [yq](https://github.com/mikefarah/yq) | — | YAML, TOML, and XML — same query syntax as `jq` |
+| [gh](https://cli.github.com/) | `curl` to GitHub API | PRs, issues, CI status, releases — all GitHub operations |
+| [bat](https://github.com/sharkdp/bat) | `cat` | File display with syntax highlighting and line numbers |
+| [eza](https://github.com/eza-community/eza) | `ls` | Directory listings with git status per file |
+| [fzf](https://github.com/junegunn/fzf) | — | Interactive fuzzy selection from any list |
+| [direnv](https://direnv.net/) | — | Project-scoped environment variables via `.envrc` |
+| [zoxide](https://github.com/ajeetdsouza/zoxide) | `cd` | Smarter directory jumping based on frecency |
+| [delta](https://github.com/dandavison/delta) | — | Syntax-highlighted git diffs |
+
 ## Ownership Boundaries
 
 - This setup **does** install tools from the repo's [mise.toml](mise.toml).
