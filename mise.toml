@@ -1,0 +1,18 @@
+[tools]
+# Tier 1: Essential — directly used by agents or unlock core capabilities
+ripgrep = "latest"
+fd      = "latest"
+jq      = "latest"
+gh      = "latest"
+
+# Tier 2: High Value — improve how agents and developers work together
+bat    = "latest"
+delta  = "latest"
+fzf    = "latest"
+yq     = "latest"
+
+# Tier 3: Quality of Life — noticeably improve day-to-day agent workflows
+zoxide = "latest"
+"aqua:eza-community/eza" = "latest"
+tlrc   = "latest"
+direnv = "latest"
