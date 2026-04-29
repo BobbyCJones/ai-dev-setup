@@ -14,6 +14,8 @@ bat    = "latest"
 delta  = "latest"
 fzf    = "latest"
 yq     = "latest"
+"github:microsoft/go-sqlcmd" = "latest"
+"github:Azure/azure-cli"    = "latest"
 
 # Tier 3: Quality of Life — noticeably improve day-to-day agent workflows
 zoxide = "latest"
