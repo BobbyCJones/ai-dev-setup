@@ -128,6 +128,38 @@ All tools are installed globally via [mise](https://mise.jdx.dev) and available 
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | `cd` | Smarter directory jumping based on frecency |
 | [delta](https://github.com/dandavison/delta) | — | Syntax-highlighted git diffs |
 
+## Why These Tools
+
+Most developer machines ship with `grep`, `find`, `cat`, and `ls`. They work, but they were designed for a different era. The tools installed here are modern replacements that are faster, safer, and composable — and they make a measurable difference both when you're working alone and when you're working with an AI agent.
+
+**Search that stays out of your way**
+
+`rg` and `fd` respect `.gitignore` by default. You never accidentally search `node_modules`, build output, or vendored dependencies. On a large repo, this is the difference between a result in milliseconds and one in seconds — and between two results and two thousand.
+
+**Structured data you can actually use**
+
+Config files, API responses, and log output are almost always JSON, YAML, TOML, or CSV. Parsing those with `grep` and `awk` is fragile — it breaks on whitespace, nested keys, and arrays. `jq`, `yq`, and `mlr` parse the structure correctly and let you query, transform, and reshape data in a single readable pipeline.
+
+**Code changes that are precise, not approximate**
+
+`sg` (ast-grep) understands code syntax, not just text. When you need to find every call to a function, rename a method across a codebase, or locate all imports of a module, text search produces false positives. `sg` matches the AST — it finds exactly what you mean regardless of whitespace or formatting differences.
+
+**Shell scripts that don't come back to haunt you**
+
+`shellcheck` catches portability bugs, quoting mistakes, and common errors that only surface on a different OS or shell version. `shfmt` formats scripts consistently. Running both before committing a script costs seconds and prevents the kind of subtle breakage that costs hours.
+
+**GitHub without the browser**
+
+`gh` covers the full GitHub workflow from the terminal: opening PRs, checking CI status, reading and posting comments, managing releases. Staying in the terminal keeps context — no tab switching, no copy-pasting URLs.
+
+**Better diffs, less friction**
+
+`delta` replaces the default git diff output with syntax-highlighted, side-by-side diffs. Code review in the terminal becomes readable. `bat` does the same for individual files — syntax highlighting and line numbers everywhere `cat` used to be plain text.
+
+**For AI agents specifically**
+
+All of the above applies equally when an AI agent is doing the work. This repo's `agent-tools.md` is designed to be included in your global `CLAUDE.md` or `AGENTS.md`, which tells the agent to use these tools by default in every project. The practical result: the agent searches faster, parses data correctly, makes precise code changes, and writes shell scripts that pass review — without you having to prompt it each session.
+
 ## Ownership Boundaries
 
 - This setup **does** install tools from the repo's [mise.toml](mise.toml).
