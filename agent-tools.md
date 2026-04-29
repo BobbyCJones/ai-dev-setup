@@ -55,3 +55,28 @@ mise list       # see all installed tools and their versions
 mise upgrade    # update all tools to latest
 mise outdated   # check what has updates available
 ```
+
+## Agent Change Tracking
+
+### Commit messages
+
+Keep commit subjects focused on the actual code or documentation change. If you are the primary author of the change and extra context would help future readers, include a short commit body covering: agent/tool used, task summary, validation performed, and notable risks. Do not force provenance into every commit.
+
+### PR descriptions
+
+When you create or materially contribute to a PR, include this section in the description:
+
+```markdown
+## AI Assistance
+
+- Agent/tool: <name if known>
+- Task: <short request summary>
+- Changes: <main areas changed>
+- Validation: <commands run, or not run with reason>
+- Risks/review focus: <known risks, assumptions, or areas needing attention>
+```
+
+### Safety
+
+- Do not include secrets, credentials, private tokens, full prompts, chat transcripts, or speculative claims.
+- Do not add file-level provenance headers.
