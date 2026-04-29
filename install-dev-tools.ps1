@@ -1,8 +1,8 @@
-# install-dev-tools.ps1
+﻿# install-dev-tools.ps1
 # Configures a Windows developer machine for agent-assisted development.
 # Installs mise, installs tools from the repo's manifest, configures git,
 # installs repo-managed shell snippets, and optionally creates agent templates.
-# Safe to run multiple times — skips or preserves user-owned config when possible.
+# Safe to run multiple times -- skips or preserves user-owned config when possible.
 #
 # Usage:
 #   .\install-dev-tools.ps1
@@ -207,10 +207,10 @@ function Install-ManagedFile {
             return
         }
         Copy-Item -LiteralPath $Source -Destination $Destination -Force
-        Write-Ok "managed file updated → $Destination"
+        Write-Ok "managed file updated -> $Destination"
     } else {
         Copy-Item -LiteralPath $Source -Destination $Destination -Force
-        Write-Ok "managed file installed → $Destination"
+        Write-Ok "managed file installed -> $Destination"
     }
 }
 
@@ -333,8 +333,6 @@ function Install-RequiredModule {
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $managedRoot = Join-Path $env:USERPROFILE ".ai-dev-setup"
 $repoManagedConfigDir = Join-Path $scriptDir "managed-config"
-$miseUserConfigDir = Join-Path $env:APPDATA "mise"
-$miseUserConfigFragmentDir = Join-Path $miseUserConfigDir "conf.d"
 $miseManagedFragmentName = "ai-dev-setup-tools.toml"
 
 $managedPowerShellSource = Join-Path $repoManagedConfigDir "powershell\dev-tools-profile.ps1"
@@ -342,46 +340,53 @@ $managedBashSource = Join-Path $repoManagedConfigDir "bash\dev-tools.bash"
 $managedMiseFragmentSource = Join-Path $repoManagedConfigDir "mise\$miseManagedFragmentName"
 $managedPowerShellTarget = Join-Path $managedRoot "powershell\dev-tools-profile.ps1"
 $managedBashTarget = Join-Path $managedRoot "bash\dev-tools.bash"
-$managedMiseFragmentTarget = Join-Path $miseUserConfigFragmentDir $miseManagedFragmentName
 $agentTemplateSource = Join-Path $scriptDir "agent-tools.md"
 
-Write-Host "`n─────────────────────────────────────────────" -ForegroundColor DarkGray
+function Get-MiseConfigDir {
+    return Join-Path $env:APPDATA "mise"
+}
+
+Write-Host "`n---------------------------------------------" -ForegroundColor DarkGray
 Write-Host " AI Developer Environment Setup" -ForegroundColor Cyan
-Write-Host "─────────────────────────────────────────────`n" -ForegroundColor DarkGray
+Write-Host "---------------------------------------------`n" -ForegroundColor DarkGray
 Write-Host " This script will make the following changes to your machine:`n" -ForegroundColor White
 Write-Host " INSTALL (via winget, if not already present)" -ForegroundColor Yellow
-Write-Host "   • mise  — tool version manager that installs everything below" -ForegroundColor White
+Write-Host "   * mise  -- tool version manager that installs everything below" -ForegroundColor White
 Write-Host ""
 Write-Host " INSTALL TOOLS (from this repo's mise.toml)" -ForegroundColor Yellow
-Write-Host "   • ripgrep, fd       — fast file and content search" -ForegroundColor White
-Write-Host "   • jq, yq            — JSON and YAML processors" -ForegroundColor White
-Write-Host "   • gh                — GitHub CLI" -ForegroundColor White
-Write-Host "   • bat               — syntax-highlighted file viewer (cat replacement)" -ForegroundColor White
-Write-Host "   • delta             — syntax-highlighted diff viewer" -ForegroundColor White
-Write-Host "   • fzf               — fuzzy finder" -ForegroundColor White
-Write-Host "   • zoxide            — smarter cd command" -ForegroundColor White
-Write-Host "   • eza               — modern file listing (ls replacement)" -ForegroundColor White
-Write-Host "   • tlrc              — community-maintained command cheat sheets" -ForegroundColor White
-Write-Host "   • direnv            — per-directory environment variables" -ForegroundColor White
+Write-Host "   * ripgrep, fd       -- fast file and content search" -ForegroundColor White
+Write-Host "   * jq, yq, mlr       -- JSON, YAML, and CSV processors" -ForegroundColor White
+Write-Host "   * gh                -- GitHub CLI" -ForegroundColor White
+Write-Host "   * sqlcmd            -- SQL Server / Azure SQL query runner" -ForegroundColor White
+Write-Host "   * az                -- Azure CLI (+ azure-devops extension)" -ForegroundColor White
+Write-Host "   * sg (ast-grep)     -- structural code search and replace" -ForegroundColor White
+Write-Host "   * shellcheck, shfmt -- shell script linting and formatting" -ForegroundColor White
+Write-Host "   * bat               -- syntax-highlighted file viewer (cat replacement)" -ForegroundColor White
+Write-Host "   * delta             -- syntax-highlighted diff viewer" -ForegroundColor White
+Write-Host "   * fzf               -- fuzzy finder" -ForegroundColor White
+Write-Host "   * zoxide            -- smarter cd command" -ForegroundColor White
+Write-Host "   * eza               -- modern file listing (ls replacement)" -ForegroundColor White
+Write-Host "   * tlrc              -- community-maintained command cheat sheets" -ForegroundColor White
+Write-Host "   * direnv            -- per-directory environment variables" -ForegroundColor White
 Write-Host ""
 Write-Host " CONFIGURE" -ForegroundColor Yellow
-Write-Host "   • Global mise      → install repo-owned fragment in %APPDATA%\\mise\\conf.d" -ForegroundColor White
-Write-Host "   • User PATH         — add mise shims so tools work in all apps" -ForegroundColor White
-Write-Host "   • Git global config — set delta defaults only when unset" -ForegroundColor White
-Write-Host "   • Managed snippets  → %USERPROFILE%\\.ai-dev-setup" -ForegroundColor White
-Write-Host "   • PowerShell / bash — add one include block that sources those snippets" -ForegroundColor White
+Write-Host "   * Global mise      -> install repo-owned fragment in %APPDATA%\\mise\\conf.d" -ForegroundColor White
+Write-Host "   * User PATH         -- add mise shims so tools work in all apps" -ForegroundColor White
+Write-Host "   * Git global config -- set delta defaults only when unset" -ForegroundColor White
+Write-Host "   * Managed snippets  -> %USERPROFILE%\\.ai-dev-setup" -ForegroundColor White
+Write-Host "   * PowerShell / bash -- add one include block that sources those snippets" -ForegroundColor White
 if ($InstallAgentTemplates) {
-    Write-Host "   • Agent templates   — create or update a repo-managed block in ~/.claude/CLAUDE.md and ~/AGENTS.md" -ForegroundColor White
+    Write-Host "   * Agent templates   -- create or update a repo-managed block in ~/.claude/CLAUDE.md and ~/AGENTS.md" -ForegroundColor White
 } else {
-    Write-Host "   • Agent templates   — no global agent files will be modified" -ForegroundColor White
+    Write-Host "   * Agent templates   -- no global agent files will be modified" -ForegroundColor White
 }
 Write-Host ""
 Write-Host " INSTALL PowerShell modules (CurrentUser scope)" -ForegroundColor Yellow
-Write-Host "   • PSReadLine        — improved PowerShell editing experience" -ForegroundColor White
-Write-Host "   • Terminal-Icons    — file type icons in terminal listings" -ForegroundColor White
+Write-Host "   * PSReadLine        -- improved PowerShell editing experience" -ForegroundColor White
+Write-Host "   * Terminal-Icons    -- file type icons in terminal listings" -ForegroundColor White
 Write-Host ""
 Write-Host " This script does not overwrite %APPDATA%\\mise\\config.toml; it manages a separate fragment file.`n" -ForegroundColor DarkGray
-Write-Host "─────────────────────────────────────────────`n" -ForegroundColor DarkGray
+Write-Host "---------------------------------------------`n" -ForegroundColor DarkGray
 
 if (-not $Yes) {
     $confirmation = Read-Host " Proceed? [Y/n]"
@@ -417,8 +422,9 @@ if (-not (Test-CommandAvailable -Name "winget")) {
 Write-Step "Installing tools from this repo's mise.toml"
 
 if (-not (Test-CommandAvailable -Name "mise")) {
-    Write-Skip "mise not found — skipping tool installation"
+    Write-Skip "mise not found -- skipping tool installation"
 } else {
+    $managedMiseFragmentTarget = Join-Path (Get-MiseConfigDir) "conf.d\$miseManagedFragmentName"
     Install-ManagedFile -Source $managedMiseFragmentSource -Destination $managedMiseFragmentTarget
     mise trust $managedMiseFragmentTarget 2>&1 | Out-Null
 
@@ -447,6 +453,33 @@ if (-not (Test-CommandAvailable -Name "mise")) {
         [System.Environment]::SetEnvironmentVariable("PATH", "$shimsDir;$currentPath", "User")
         Write-Ok "mise shims added to User PATH ($shimsDir)"
     }
+
+    # Also prepend shims to the current process PATH so subsequent steps can find tools
+    # that were just installed by mise without requiring a new terminal session.
+    if ($env:PATH -notlike "*$shimsDir*") {
+        $env:PATH = "$shimsDir;$env:PATH"
+    }
+}
+
+Write-Step "Installing Azure CLI extensions"
+
+if (-not (Test-CommandAvailable -Name "az")) {
+    Write-Skip "az not found -- skipping extension installation"
+} else {
+    $azExtensions = az extension list --query "[].name" -o tsv 2>$null
+    if ($azExtensions -match "azure-devops") {
+        Write-Skip "azure-devops extension already installed"
+    } else {
+        $output = az extension add --name azure-devops --only-show-errors 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Ok "azure-devops extension installed"
+        } else {
+            Write-Fail "azure-devops extension install failed"
+            $output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object {
+                Write-Host "       $_" -ForegroundColor DarkGray
+            }
+        }
+    }
 }
 
 Write-Step "Configuring git to use delta for diffs"
@@ -455,9 +488,9 @@ $hasGit = Test-CommandAvailable -Name "git"
 $hasDelta = Test-CommandAvailable -Name "delta"
 
 if (-not $hasGit) {
-    Write-Skip "git not found in PATH — skipping git config"
+    Write-Skip "git not found in PATH -- skipping git config"
 } elseif (-not $hasDelta) {
-    Write-Skip "delta not found in PATH — skipping git config"
+    Write-Skip "delta not found in PATH -- skipping git config"
 } else {
     $gitSettings = @(
         [pscustomobject]@{ Key = "core.pager";             Value = "delta" }
@@ -493,7 +526,7 @@ $policy = Get-CurrentUserExecutionPolicy
 if ($null -eq $policy) {
     Write-Skip "ExecutionPolicy check skipped for this PowerShell session"
 } elseif ($policy -eq "Restricted" -or $policy -eq "Undefined") {
-    Write-Warn "CurrentUser execution policy is '$policy' — profile scripts will not load automatically."
+    Write-Warn "CurrentUser execution policy is '$policy' -- profile scripts will not load automatically."
     Write-Host "       Run this once in a PowerShell terminal if you want profile scripts enabled:" -ForegroundColor DarkGray
     Write-Host "       Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser" -ForegroundColor DarkGray
 } else {
@@ -580,10 +613,10 @@ $agentTemplateContent
         }
     }
 
-    Write-Warn "Cursor: open Settings → Rules for AI and copy the contents of agent-tools.md if desired"
+    Write-Warn "Cursor: open Settings -> Rules for AI and copy the contents of agent-tools.md if desired"
 }
 
-Write-Host "`n─────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "`n---------------------------------------------" -ForegroundColor DarkGray
 if ($script:HadFailures) {
     Write-Host " Setup completed with failures." -ForegroundColor Red
 } elseif ($script:HadWarnings) {
@@ -593,5 +626,6 @@ if ($script:HadFailures) {
 }
 Write-Host " Open a new terminal window for all changes to take effect." -ForegroundColor Yellow
 Write-Host " Run 'gh auth login' if you haven't authenticated with GitHub." -ForegroundColor Yellow
+Write-Host " Run 'az login' if you haven't authenticated with Azure." -ForegroundColor Yellow
 Write-Host " Managed shell files live under %USERPROFILE%\\.ai-dev-setup." -ForegroundColor Yellow
-Write-Host "─────────────────────────────────────────────`n" -ForegroundColor DarkGray
+Write-Host "---------------------------------------------`n" -ForegroundColor DarkGray
