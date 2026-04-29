@@ -119,6 +119,8 @@ All tools are installed globally via [mise](https://mise.jdx.dev) and available 
 | [sg](https://ast-grep.github.io/) (ast-grep) | `rg` for code patterns | Structural code search and replace using AST patterns, not text |
 | [shellcheck](https://www.shellcheck.net/) | — | Lints shell scripts; catches portability bugs and common mistakes |
 | [shfmt](https://github.com/mvdan/sh) | — | Formats shell scripts consistently |
+| [sqlcmd](https://github.com/microsoft/go-sqlcmd) | — | SQL Server and Azure SQL query runner |
+| [az](https://github.com/Azure/azure-cli) (Azure CLI) | `curl` to Azure APIs | Provision and manage Azure resources from the terminal; includes the `azure-devops` extension |
 | [bat](https://github.com/sharkdp/bat) | `cat` | File display with syntax highlighting and line numbers |
 | [eza](https://github.com/eza-community/eza) | `ls` | Directory listings with git status per file |
 | [fzf](https://github.com/junegunn/fzf) | — | Interactive fuzzy selection from any list |

@@ -22,6 +22,11 @@ These tools are installed globally via mise. Use them instead of fallbacks.
 - **shellcheck** — lint any shell script before considering it done. Run `shellcheck <script.sh>` and resolve all warnings.
 - **shfmt** — format shell scripts with `shfmt -w <script.sh>`. Run after writing or editing any shell script.
 
+## Database
+
+- **sqlcmd** — use for querying SQL Server and Azure SQL databases. Run ad-hoc queries (`sqlcmd -S <server> -Q "SELECT ..."`) or execute `.sql` script files (`sqlcmd -S <server> -i script.sql`).
+- **az** (Azure CLI) — use for all Azure resource operations: provisioning, querying resource state, managing credentials, and interacting with Azure services. Prefer over raw `curl` to Azure REST APIs. The `azure-devops` extension is installed: use `az devops`, `az pipelines`, `az repos`, and `az boards` for Azure DevOps operations.
+
 ## GitHub
 
 - **gh** — use for all GitHub operations: creating PRs, commenting on issues, checking CI status, managing releases. Prefer over raw `git` commands or `curl` to the GitHub API.

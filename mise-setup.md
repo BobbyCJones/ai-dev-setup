@@ -151,6 +151,16 @@ Interactive fuzzy finder. Lets agents build selection menus that hand off a sing
 
 Like `jq` but for YAML, TOML, and XML. Agents use it to edit CI pipelines, Kubernetes manifests, and Docker Compose files without brittle line-based editing.
 
+#### `sqlcmd`
+
+Microsoft's SQL Server CLI. Run queries against SQL Server or Azure SQL from the terminal. Agents use it to inspect schemas, run migrations, and validate data without needing SSMS or a GUI.
+
+#### `az` (Azure CLI)
+
+Microsoft's Azure CLI. Provision and manage Azure resources, query resource state, and interact with Azure services from the terminal. Agents use it instead of raw REST calls to the Azure API.
+
+The `azure-devops` extension is installed automatically, enabling `az devops`, `az pipelines`, `az repos`, and `az boards` commands for working with Azure DevOps organizations, projects, pipelines, and repositories.
+
 ### Tier 3 — Quality of Life
 
 #### `zoxide`
