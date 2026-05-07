@@ -1,12 +1,12 @@
 # Agent Guidance
 
-Tools below are installed globally via mise. Use them instead of POSIX defaults.
+Tools below are installed globally via mise. Use them when they add capability beyond Claude Code's built-in file, search, and edit tools.
 
 ## Preferred CLI tools
 
 Installed globally via mise. Prefer them when they fit the task:
 
-- Search / discovery (respect `.gitignore`): `rg` (over `grep`), `fd` (over `find`), `sg` (ast-grep) for structural code search when text search is too broad
+- Search: `sg` (ast-grep) for structural code search when text search is too broad
 - Structured data: `jq` (JSON), `yq` (YAML/TOML/XML), `mlr` (CSV/TSV) — don't parse with `grep`/`sed`/`awk`
 - GitHub: `gh` for PRs, issues, CI, releases (over raw `git` or `curl`)
 - Azure: `az`, plus `az devops`/`pipelines`/`repos`/`boards` from the `azure-devops` extension
@@ -20,7 +20,6 @@ Installed globally via mise. Prefer them when they fit the task:
 Start bounded, expand deliberately. Unbounded tool output wastes context.
 
 - Inspect with `git status --short`, `git diff --name-only`, then targeted `git diff -- <path>`
-- Use `rg -l <pattern>` and `rg -n --max-count 20 <pattern>` to cap matches
 - Use `gh pr list --limit 20 --json number,title,url` over unfiltered dumps
 - Use `az boards query --wiql "<WIQL>" --query "[0:20].id" -o tsv` and request only needed fields with `--fields`
 - Read only the files needed for the task
