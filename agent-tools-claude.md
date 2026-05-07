@@ -12,7 +12,7 @@ Installed globally via mise. Prefer them when they fit the task:
 - Azure: `az`, plus `az devops`/`pipelines`/`repos`/`boards` from the `azure-devops` extension
 - SQL Server / Azure SQL: `sqlcmd` (`-Q` ad-hoc, `-i` script files)
 - HTTP / API testing: `curl`
-- Shell scripts: `shellcheck` (resolve all warnings), `shfmt -w` (format)
+- Shell scripts: `shellcheck` (resolve warnings or document intentional suppressions), `shfmt -w` (format)
 - `direnv` — do **not** modify `.envrc` without explicit instruction
 
 ## Context budget
@@ -21,6 +21,7 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 
 - Inspect with `git status --short`, `git diff --name-only`, then targeted `git diff -- <path>`
 - Use `gh pr list --limit 20 --json number,title,url` over unfiltered dumps
+- `az devops` defaults are pre-configured to `https://dev.azure.com/dwhomes/` / `IS-Aligned` by `install-dev-tools.ps1`; pass `--org` / `--project` only when intentionally working outside them. If `az boards` errors with a missing-org/project message, run `az devops configure --list` to diagnose
 - Use `az boards query --wiql "<WIQL>" --query "[0:20].id" -o tsv` and request only needed fields with `--fields`
 - Read only the files needed for the task
 
@@ -33,7 +34,7 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 
 ## Change tracking
 
-**Commits.** Subject describes the change. Add a body only when context isn't obvious from the diff.
+**Commits.** Subject describes the change. Add a body only when context isn't obvious from the diff. One commit per logical change — don't bundle unrelated cleanups, refactors, or docs into a feature commit. If staging is mixed, split before committing. Stage explicit paths or hunks; avoid `git add .` unless the working tree contains only that commit's concern.
 
 **PRs.** When you create or materially contribute to one, include:
 
@@ -47,4 +48,4 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 - Risks/review focus: <known risks, assumptions, or areas needing attention>
 ```
 
-**Safety.** No secrets, credentials, tokens, prompts, transcripts, or speculative claims. No file-level provenance headers.
+**Safety.** No secrets, credentials, tokens, private prompts or private transcripts, or speculative claims. No file-level provenance headers.
