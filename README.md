@@ -31,6 +31,12 @@ For Cursor: open this folder, launch Composer (`Ctrl+I`), and send the same prom
 .\install-dev-tools.ps1
 ```
 
+The installer configures Azure DevOps CLI defaults for `https://dev.azure.com/dwhomes/` and `IS-Aligned` so `az boards`, `az pipelines`, and `az repos` work from GitHub checkouts. To leave existing Azure DevOps defaults untouched:
+
+```powershell
+.\install-dev-tools.ps1 -SkipAzureDevOpsDefaults
+```
+
 See [mise-setup.md](mise-setup.md) for the detailed walkthrough and verification steps.
 
 ## Global Machine Setup

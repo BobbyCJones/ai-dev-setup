@@ -162,6 +162,12 @@ Microsoft's Azure CLI. Provision and manage Azure resources, query resource stat
 
 The `azure-devops` extension is installed automatically, enabling `az devops`, `az pipelines`, `az repos`, and `az boards` commands for working with Azure DevOps organizations, projects, pipelines, and repositories.
 
+Azure DevOps commands need an organization, and many commands also need a project. The installer configures defaults for `https://dev.azure.com/dwhomes/` and `IS-Aligned` because this repo targets that environment. To leave existing Azure DevOps defaults untouched:
+
+```powershell
+.\install-dev-tools.ps1 -SkipAzureDevOpsDefaults
+```
+
 ### Tier 3 — Quality of Life
 
 #### `zoxide`

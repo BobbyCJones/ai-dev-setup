@@ -91,6 +91,12 @@ cp /path/to/dev-setup/agent-tools.md ./AGENTS.md
 
 If the project uses Azure DevOps for work tracking, add this block to your project's `AGENTS.md` or `CLAUDE.md` so agents can create and link tickets without re-deriving the workflow each session.
 
+The machine installer configures these Azure DevOps CLI defaults automatically to avoid repeated `--org` / `--project` failures:
+
+```powershell
+az devops configure --defaults organization=https://dev.azure.com/dwhomes/ project=IS-Aligned
+```
+
 **Board constants for Product Development:**
 - Org: `https://dev.azure.com/dwhomes/`
 - Project: `IS-Aligned`

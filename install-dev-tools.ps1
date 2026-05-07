@@ -8,6 +8,7 @@
 #   .\install-dev-tools.ps1
 #   .\install-dev-tools.ps1 -Yes
 #   .\install-dev-tools.ps1 -Yes -InstallAgentTemplates
+#   .\install-dev-tools.ps1 -SkipAzureDevOpsDefaults
 #
 # Requirements:
 #   - Windows 10/11 with winget (App Installer)
@@ -19,7 +20,10 @@
 [CmdletBinding()]
 param(
     [switch]$Yes,
-    [switch]$InstallAgentTemplates
+    [switch]$InstallAgentTemplates,
+    [switch]$SkipAzureDevOpsDefaults,
+    [string]$AzureDevOpsOrganization = "https://dev.azure.com/dwhomes/",
+    [string]$AzureDevOpsProject = "IS-Aligned"
 )
 
 Set-StrictMode -Version Latest
@@ -364,6 +368,28 @@ function Install-RequiredModule {
     }
 }
 
+function ConvertTo-AzureDevOpsOrgUrl {
+    param([Parameter(Mandatory = $true)][string]$Organization)
+
+    $trimmed = $Organization.Trim()
+    if ([string]::IsNullOrWhiteSpace($trimmed)) {
+        return ""
+    }
+
+    if ($trimmed -match "^https?://") {
+        if ($trimmed.EndsWith("/")) {
+            return $trimmed
+        }
+        return "$trimmed/"
+    }
+
+    if ($trimmed -match "^[A-Za-z0-9][A-Za-z0-9_-]*$") {
+        return "https://dev.azure.com/$trimmed/"
+    }
+
+    return $trimmed
+}
+
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $managedRoot = Join-Path $env:USERPROFILE ".ai-dev-setup"
 $repoManagedConfigDir = Join-Path $scriptDir "managed-config"
@@ -408,6 +434,11 @@ Write-Host " CONFIGURE" -ForegroundColor Yellow
 Write-Host "   * Global mise      -> install repo-owned fragment in %APPDATA%\\mise\\conf.d" -ForegroundColor White
 Write-Host "   * User PATH         -- add mise shims so tools work in all apps" -ForegroundColor White
 Write-Host "   * Git global config -- set delta defaults only when unset" -ForegroundColor White
+if ($SkipAzureDevOpsDefaults) {
+    Write-Host "   * Azure DevOps      -- defaults unchanged because -SkipAzureDevOpsDefaults was passed" -ForegroundColor White
+} else {
+    Write-Host "   * Azure DevOps      -- set az devops defaults for $AzureDevOpsOrganization / $AzureDevOpsProject" -ForegroundColor White
+}
 Write-Host "   * Managed snippets  -> %USERPROFILE%\\.ai-dev-setup" -ForegroundColor White
 Write-Host "   * PowerShell / bash -- add one include block that sources those snippets" -ForegroundColor White
 if ($InstallAgentTemplates) {
@@ -510,6 +541,38 @@ if (-not (Test-CommandAvailable -Name "az")) {
             Write-Ok "azure-devops extension installed"
         } else {
             Write-Fail "azure-devops extension install failed"
+            $output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object {
+                Write-Host "       $_" -ForegroundColor DarkGray
+            }
+        }
+    }
+}
+
+Write-Step "Configuring Azure DevOps defaults"
+
+if (-not (Test-CommandAvailable -Name "az")) {
+    Write-Skip "az not found -- skipping Azure DevOps defaults"
+} elseif ($SkipAzureDevOpsDefaults) {
+    Write-Skip "Azure DevOps defaults skipped"
+} else {
+    $normalizedAzureDevOpsOrganization = ConvertTo-AzureDevOpsOrgUrl -Organization $AzureDevOpsOrganization
+    if ([string]::IsNullOrWhiteSpace($normalizedAzureDevOpsOrganization)) {
+        Write-Warn "Azure DevOps organization was not provided; leaving az devops defaults unchanged"
+    } else {
+        $devopsDefaults = @("organization=$normalizedAzureDevOpsOrganization")
+        if (-not [string]::IsNullOrWhiteSpace($AzureDevOpsProject)) {
+            $devopsDefaults += "project=$($AzureDevOpsProject.Trim())"
+        }
+
+        $output = az devops configure --defaults @devopsDefaults 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            if ([string]::IsNullOrWhiteSpace($AzureDevOpsProject)) {
+                Write-Ok "az devops organization default = $normalizedAzureDevOpsOrganization"
+            } else {
+                Write-Ok "az devops defaults = $normalizedAzureDevOpsOrganization / $($AzureDevOpsProject.Trim())"
+            }
+        } else {
+            Write-Fail "az devops defaults update failed"
             $output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object {
                 Write-Host "       $_" -ForegroundColor DarkGray
             }
