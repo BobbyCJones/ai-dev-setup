@@ -102,7 +102,8 @@ See [project-setup.md](project-setup.md) for the fuller per-project template and
 | [managed-config/](managed-config) | Repo-owned mise and shell snippets installed under user config directories |
 | [mise-setup.md](mise-setup.md) | Machine setup guide and verification steps |
 | [project-setup.md](project-setup.md) | What to add to each project repo |
-| [agent-tools.md](agent-tools.md) | Optional template for global agent instructions |
+| [agent-tools-claude.md](agent-tools-claude.md) | Claude Code-specific template for global `CLAUDE.md` instructions |
+| [agent-tools.md](agent-tools.md) | Codex/generic CLI template for global `AGENTS.md` instructions |
 
 ## Installed Tools
 
@@ -158,7 +159,7 @@ Config files, API responses, and log output are almost always JSON, YAML, TOML, 
 
 **For AI agents specifically**
 
-All of the above applies equally when an AI agent is doing the work. This repo's `agent-tools.md` is designed to be included in your global `CLAUDE.md` or `AGENTS.md`, which tells the agent to use these tools by default in every project. The practical result: the agent searches faster, parses data correctly, makes precise code changes, and writes shell scripts that pass review — without you having to prompt it each session.
+All of the above applies when an AI agent is doing the work, but Claude Code and Codex need slightly different global instructions. This repo installs `agent-tools-claude.md` into global `CLAUDE.md` and `agent-tools.md` into global `AGENTS.md` when `-InstallAgentTemplates` is used. Claude Code keeps its built-in file/search/edit workflow, while Codex and generic CLI agents get bounded shell command guidance. The practical result: agents search faster, parse data correctly, make precise code changes, and write shell scripts that pass review — without you having to prompt it each session.
 
 ## Ownership Boundaries
 
@@ -167,7 +168,7 @@ All of the above applies equally when an AI agent is doing the work. This repo's
 - This setup **does** install repo-managed shell snippets under `%USERPROFILE%\.ai-dev-setup`.
 - This setup **does** add one include block to PowerShell profiles and `~/.bashrc`.
 - This setup **does not** overwrite `%APPDATA%\mise\config.toml`.
-- This setup **does not** overwrite existing `~/.claude/CLAUDE.md` or `~/AGENTS.md`.
+- This setup **does not** overwrite user content in `~/.claude/CLAUDE.md` or `~/AGENTS.md`; with `-InstallAgentTemplates`, it creates or updates only the repo-managed blocks.
 
 ## Re-running
 

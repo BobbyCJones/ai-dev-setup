@@ -1,7 +1,7 @@
 ﻿# install-dev-tools.ps1
 # Configures a Windows developer machine for agent-assisted development.
 # Installs mise, installs tools from the repo's manifest, configures git,
-# installs repo-managed shell snippets, and optionally creates agent templates.
+# installs repo-managed shell snippets, and optionally manages global agent template blocks.
 # Safe to run multiple times -- skips or preserves user-owned config when possible.
 #
 # Usage:
@@ -103,12 +103,17 @@ function Get-TextFileState {
         }
     }
 
-    $reader = [System.IO.StreamReader]::new($Path, $true)
+    $reader = $null
     try {
+        $reader = [System.IO.StreamReader]::new($Path, $true)
         $content = $reader.ReadToEnd()
         $encoding = $reader.CurrentEncoding
+    } catch {
+        throw "Could not read text file '$Path': $($_.Exception.Message)"
     } finally {
-        $reader.Dispose()
+        if ($null -ne $reader) {
+            $reader.Dispose()
+        }
     }
 
     $newlineMatch = [regex]::Match($content, "`r`n|`n|`r")
@@ -139,9 +144,15 @@ function Add-NamedBlockIfMissing {
         [Parameter(Mandatory = $true)][string]$Content
     )
 
-    $state = Get-TextFileState -Path $File
+    try {
+        $state = Get-TextFileState -Path $File
+    } catch {
+        Write-Warn $_.Exception.Message
+        return "skipped"
+    }
+
     if ($state.Content -match [regex]::Escape($Marker)) {
-        return $false
+        return "unchanged"
     }
 
     $normalizedContent = ($Content -replace "`r`n", "`n") -replace "`r", "`n"
@@ -150,8 +161,14 @@ function Add-NamedBlockIfMissing {
     }
 
     $prefix = if ([string]::IsNullOrEmpty($state.Content)) { "" } else { $state.NewLine }
-    Write-TextFile -Path $File -Content ($state.Content + $prefix + $normalizedContent) -Encoding $state.Encoding
-    return $true
+    try {
+        Write-TextFile -Path $File -Content ($state.Content + $prefix + $normalizedContent) -Encoding $state.Encoding
+    } catch {
+        Write-Warn "Could not update text file '$File': $($_.Exception.Message)"
+        return "skipped"
+    }
+
+    return "inserted"
 }
 
 function Set-NamedBlock {
@@ -162,7 +179,13 @@ function Set-NamedBlock {
         [Parameter(Mandatory = $true)][string]$Content
     )
 
-    $state = Get-TextFileState -Path $File
+    try {
+        $state = Get-TextFileState -Path $File
+    } catch {
+        Write-Warn $_.Exception.Message
+        return "skipped"
+    }
+
     $normalizedContent = ($Content -replace "`r`n", "`n") -replace "`r", "`n"
     if ($state.NewLine -ne "`n") {
         $normalizedContent = $normalizedContent -replace "`n", $state.NewLine
@@ -177,12 +200,23 @@ function Set-NamedBlock {
         }
 
         $updated = $state.Content.Substring(0, $existingBlock.Index) + $normalizedContent + $state.Content.Substring($existingBlock.Index + $existingBlock.Length)
-        Write-TextFile -Path $File -Content $updated -Encoding $state.Encoding
+        try {
+            Write-TextFile -Path $File -Content $updated -Encoding $state.Encoding
+        } catch {
+            Write-Warn "Could not update text file '$File': $($_.Exception.Message)"
+            return "skipped"
+        }
         return "updated"
     }
 
     $prefix = if ([string]::IsNullOrEmpty($state.Content)) { "" } else { $state.NewLine }
-    Write-TextFile -Path $File -Content ($state.Content + $prefix + $normalizedContent) -Encoding $state.Encoding
+    try {
+        Write-TextFile -Path $File -Content ($state.Content + $prefix + $normalizedContent) -Encoding $state.Encoding
+    } catch {
+        Write-Warn "Could not update text file '$File': $($_.Exception.Message)"
+        return "skipped"
+    }
+
     return "inserted"
 }
 
@@ -341,6 +375,7 @@ $managedMiseFragmentSource = Join-Path $repoManagedConfigDir "mise\$miseManagedF
 $managedPowerShellTarget = Join-Path $managedRoot "powershell\dev-tools-profile.ps1"
 $managedBashTarget = Join-Path $managedRoot "bash\dev-tools.bash"
 $agentTemplateSource = Join-Path $scriptDir "agent-tools.md"
+$agentClaudeTemplateSource = Join-Path $scriptDir "agent-tools-claude.md"
 
 function Get-MiseConfigDir {
     return Join-Path $env:APPDATA "mise"
@@ -560,10 +595,11 @@ foreach ($psHost in $psHosts) {
     }
 
     $profilePath = $profilePath.Trim()
-    if (Add-NamedBlockIfMissing -File $profilePath -Marker ">>> ai-dev-setup: include >>>" -Content $psIncludeBlock) {
-        Write-Ok "$($psHost.Name) include block added"
-    } else {
-        Write-Skip "$($psHost.Name) include block already configured"
+    $profileResult = Add-NamedBlockIfMissing -File $profilePath -Marker ">>> ai-dev-setup: include >>>" -Content $psIncludeBlock
+    switch ($profileResult) {
+        "inserted"  { Write-Ok "$($psHost.Name) include block added" }
+        "unchanged" { Write-Skip "$($psHost.Name) include block already configured" }
+        default     { Write-Skip "$($psHost.Name) include block skipped" }
     }
 }
 
@@ -578,27 +614,30 @@ fi
 # <<< ai-dev-setup: include <<<
 "@
 
-if (Add-NamedBlockIfMissing -File $bashrc -Marker ">>> ai-dev-setup: include >>>" -Content $bashIncludeBlock) {
-    Write-Ok "bash include block added"
-} else {
-    Write-Skip "bash include block already configured"
+$bashResult = Add-NamedBlockIfMissing -File $bashrc -Marker ">>> ai-dev-setup: include >>>" -Content $bashIncludeBlock
+switch ($bashResult) {
+    "inserted"  { Write-Ok "bash include block added" }
+    "unchanged" { Write-Skip "bash include block already configured" }
+    default     { Write-Skip "bash include block skipped" }
 }
 
 Write-Step "Handling agent templates"
 
-if (-not (Test-Path -LiteralPath $agentTemplateSource)) {
-    Write-Fail "agent-tools.md not found at $agentTemplateSource"
-} elseif (-not $InstallAgentTemplates) {
+if (-not $InstallAgentTemplates) {
     Write-Skip "agent templates not requested"
-    Write-Host "       Use agent-tools.md as a manual starting point for ~/.claude/CLAUDE.md or ~/AGENTS.md" -ForegroundColor DarkGray
+    Write-Host "       Use agent-tools-claude.md for ~/.claude/CLAUDE.md and agent-tools.md for ~/AGENTS.md" -ForegroundColor DarkGray
+} elseif (-not (Test-Path -LiteralPath $agentTemplateSource)) {
+    Write-Fail "agent-tools.md not found at $agentTemplateSource"
+} elseif (-not (Test-Path -LiteralPath $agentClaudeTemplateSource)) {
+    Write-Fail "agent-tools-claude.md not found at $agentClaudeTemplateSource"
 } else {
-    $agentTemplateContent = Get-Content -LiteralPath $agentTemplateSource -Raw
     $agentTargets = @(
-        [pscustomobject]@{ Path = (Join-Path $env:USERPROFILE ".claude\CLAUDE.md"); Label = "Claude template" }
-        [pscustomobject]@{ Path = (Join-Path $env:USERPROFILE "AGENTS.md"); Label = "Codex template" }
+        [pscustomobject]@{ Path = (Join-Path $env:USERPROFILE ".claude\CLAUDE.md"); Label = "Claude template"; Source = $agentClaudeTemplateSource }
+        [pscustomobject]@{ Path = (Join-Path $env:USERPROFILE "AGENTS.md"); Label = "Codex template"; Source = $agentTemplateSource }
     )
 
     foreach ($target in $agentTargets) {
+        $agentTemplateContent = Get-Content -LiteralPath $target.Source -Raw
         $managedBlock = @"
 <!-- >>> ai-dev-setup: agent-tools >>> -->
 $agentTemplateContent
@@ -609,7 +648,8 @@ $agentTemplateContent
         switch ($result) {
             "inserted" { Write-Ok "$($target.Label) managed block added to $($target.Path)" }
             "updated"  { Write-Ok "$($target.Label) managed block updated in $($target.Path)" }
-            default    { Write-Skip "$($target.Label) managed block already current" }
+            "unchanged" { Write-Skip "$($target.Label) managed block already current" }
+            default    { Write-Skip "$($target.Label) managed block skipped" }
         }
     }
 

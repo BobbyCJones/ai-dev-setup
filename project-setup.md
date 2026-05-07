@@ -75,11 +75,16 @@ export NODE_ENV="development"
 
 ## 3. Per-Project Agent Instructions
 
-For project-specific agent behavior, add an `AGENTS.md` or `CLAUDE.md` to the repo root. The `agent-tools.md` from the machine setup is a starting point — copy and extend it with project-specific context.
+For project-specific agent behavior, add an `AGENTS.md` or `CLAUDE.md` to the repo root. The machine setup includes separate starting points for Claude Code and Codex/generic CLI agents — copy the matching file and extend it with project-specific context.
 
 ```bash
-cp /path/to/dev-setup/agent-tools.md ./CLAUDE.md
-# then add project-specific instructions below
+# Claude Code
+cp /path/to/dev-setup/agent-tools-claude.md ./CLAUDE.md
+
+# Codex / generic CLI agents
+cp /path/to/dev-setup/agent-tools.md ./AGENTS.md
+
+# then add project-specific instructions below the copied template
 ```
 
 ## New Developer Onboarding

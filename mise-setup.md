@@ -62,7 +62,8 @@ The script handles everything else:
 - Installs `PSReadLine` and `Terminal-Icons` in `CurrentUser` scope
 - Copies repo-managed shell snippets to `~/.ai-dev-setup/`
 - Adds one include block to PowerShell profiles and `~/.bashrc`
-- Optionally creates `~/.claude/CLAUDE.md` and `~/AGENTS.md` only when they do not already exist
+- Optionally creates or updates repo-managed blocks in `~/.claude/CLAUDE.md` and `~/AGENTS.md`
+- Uses `agent-tools-claude.md` for Claude Code and `agent-tools.md` for Codex/generic CLI agents
 
 ### 3. Open a new terminal
 
@@ -103,8 +104,8 @@ This repo owns:
 This repo does not overwrite:
 
 - `%APPDATA%\mise\config.toml`
-- Existing `~/.claude/CLAUDE.md`
-- Existing `~/AGENTS.md`
+- User content in `~/.claude/CLAUDE.md`; with `-InstallAgentTemplates`, only the repo-managed block is created or updated
+- User content in `~/AGENTS.md`; with `-InstallAgentTemplates`, only the repo-managed block is created or updated
 - Existing git config values that differ from the repo's suggested defaults
 
 ## Tool Reference
