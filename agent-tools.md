@@ -30,7 +30,7 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 
 ## Behavior principles
 
-1. **Don't assume. Don't hide confusion. Surface tradeoffs.** Ask rather than guess at formats, scope, or constraints.
+1. **Make reasonable assumptions and proceed; state them clearly.** Ask only when ambiguity blocks progress. Don't hide confusion. Surface tradeoffs.
 2. **Minimum code that solves the problem. Nothing speculative.** No premature abstraction.
 3. **Touch only what you must. Clean up only your own mess.** Small, reviewable diffs.
 4. **Define success criteria. Loop until verified.**
