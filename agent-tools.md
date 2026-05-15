@@ -23,7 +23,9 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 - Use `rg -l <pattern>` and `rg -n --max-count 20 <pattern>` to cap matches
 - Use `gh pr list --limit 20 --json number,title,url` over unfiltered dumps
 - `az devops` defaults are pre-configured to `https://dev.azure.com/dwhomes/` / `IS-Aligned` by `install-dev-tools.ps1`; pass `--org` / `--project` only when intentionally working outside them. If `az boards` errors with a missing-org/project message, run `az devops configure --list` to diagnose
-- Use `az boards query --wiql "<WIQL>" --query "[0:20].id" -o tsv` and request only needed fields with `--fields`
+- `az boards query`: bound results with `--query "[0:20].id" -o tsv`; it does not support `--fields`
+- `az boards work-item show`: use `--fields` only with `--expand none`, e.g. `az boards work-item show --id <id> --expand none --fields System.Id,System.Title`, or pipe full output to `jq`
+- `az boards work-item relation add --relation-type`: use the **friendly name** (`"Parent"`, `"Child"`) not the reference name (`System.LinkTypes.Hierarchy-Reverse`). Run `az boards work-item relation list-type` to discover available names.
 - Read only the files needed for the task
 
 ## Behavior principles
@@ -36,6 +38,16 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 ## Change tracking
 
 **Commits.** Subject describes the change. Add a body only when context isn't obvious from the diff. One commit per logical change — don't bundle unrelated cleanups, refactors, or docs into a feature commit. If staging is mixed, split before committing. Stage explicit paths or hunks; avoid `git add .` unless the working tree contains only that commit's concern.
+
+**Fork -> upstream PRs.** When the repo has a separate upstream remote (e.g., `Upstream-DWH`):
+1. Resolve the upstream repository as `OWNER/REPO`; `gh --repo` does not accept git remote names:
+   `gh repo view <upstream-owner>/<upstream-repo> --json defaultBranchRef --jq '.defaultBranchRef.name'`
+2. Push to origin, then create the PR targeting upstream. Always quote `--head` because branch names with `#` or other shell metacharacters can be parsed incorrectly:
+   `gh pr create --repo <upstream-owner>/<upstream-repo> --head "<fork-owner>:<branch>" --base <default-branch> --title "..." --body "..."`
+3. If `gh pr create --repo` fails, use the API directly:
+   `gh api repos/<upstream-owner>/<upstream-repo>/pulls --method POST --field head="<fork-owner>:<branch>" --field base="<default-branch>" --field title="..." --field body="..."`
+4. Add reviewers separately:
+   `gh api repos/<upstream-owner>/<upstream-repo>/pulls/<number>/requested_reviewers --method POST --field "reviewers[]=<username>"`
 
 **PRs.** When you create or materially contribute to one, include:
 
