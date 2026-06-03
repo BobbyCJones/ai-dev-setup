@@ -55,8 +55,7 @@ mise upgrade    # update all tools
 
 ## Agent Behavior Principles
 
-1. **Don't assume. Don't hide confusion. Surface tradeoffs.**
-   Ask clarifying questions instead of guessing formats, scope, or constraints.
+1. **Make reasonable assumptions and proceed; state them clearly.** Ask only when ambiguity blocks progress. Don't hide confusion. Surface tradeoffs.
 
 2. **Minimum code that solves the problem. Nothing speculative.**
    Avoid premature abstraction and over-engineering.
@@ -70,3 +69,14 @@ mise upgrade    # update all tools
 ## Shell Targets
 
 Scripts must work in Git Bash on Windows. PowerShell variants (`.ps1`) exist for Windows-native contexts. WSL is not required or assumed.
+
+## Writing standards
+
+Apply to all documentation and agent instruction files in this repo:
+
+- **Every word adds value.** Cut ruthlessly.
+- **Active voice, definitive statements.** Avoid: "may," "currently," "designed to," "where possible."
+- **Each fact appears once.** Cross-reference; never repeat.
+- **Simple language, short sentences.** No jargon. One concept per sentence.
+- **No defensive language.** Avoid: "(for now)," "(currently limited)," qualifiers that weaken statements.
+- **Structure for scannability.** Clear headings, short paragraphs.

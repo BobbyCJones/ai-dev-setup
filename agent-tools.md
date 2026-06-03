@@ -1,10 +1,8 @@
 # Agent Guidance
 
-Tools below are installed globally via mise. Use them instead of POSIX defaults.
+These tools are installed globally via mise. Use them instead of POSIX defaults.
 
 ## Preferred CLI tools
-
-Installed globally via mise. Prefer them when they fit the task:
 
 - Search / discovery (respect `.gitignore`): `rg` (over `grep`), `fd` (over `find`), `sg` (ast-grep) for structural code search when text search is too broad
 - Structured data: `jq` (JSON), `yq` (YAML/TOML/XML), `mlr` (CSV/TSV) — don't parse with `grep`/`sed`/`awk`
@@ -35,6 +33,17 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 3. **Touch only what you must. Clean up only your own mess.** Small, reviewable diffs.
 4. **Define success criteria. Loop until verified.**
 
+## Writing standards
+
+Apply to all documentation and agent instruction files:
+
+- **Every word adds value.** Cut ruthlessly.
+- **Active voice, definitive statements.** Avoid: "may," "currently," "designed to," "where possible."
+- **Each fact appears once.** Cross-reference; never repeat.
+- **Simple language, short sentences.** No jargon. One concept per sentence.
+- **No defensive language.** Avoid: "(for now)," "(currently limited)," qualifiers that weaken statements.
+- **Structure for scannability.** Clear headings, short paragraphs.
+
 ## Change tracking
 
 **Branches.** Name branches using the ADO ticket number prefixed with `AB#`: `AB#1234`.
@@ -51,7 +60,7 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 4. Add reviewers separately:
    `gh api repos/<upstream-owner>/<upstream-repo>/pulls/<number>/requested_reviewers --method POST --field "reviewers[]=<username>"`
 
-**PRs.** When you create or materially contribute to one, include:
+**PRs.** When you create or contribute to a PR, include:
 
 ```markdown
 ## AI Assistance

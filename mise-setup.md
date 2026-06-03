@@ -58,7 +58,7 @@ The script handles everything else:
 - Installs a repo-owned global mise fragment under `%APPDATA%\mise\conf.d`
 - Runs `mise install` from this repo to install the toolset declared in [mise.toml](mise.toml)
 - Adds `%LOCALAPPDATA%\mise\shims` to your user `PATH` if needed
-- Configures git to use delta defaults only when those keys are currently unset
+- Configures git to use delta defaults only when those keys are unset
 - Installs `PSReadLine` and `Terminal-Icons` in `CurrentUser` scope
 - Copies repo-managed shell snippets to `~/.ai-dev-setup/`
 - Adds one include block to PowerShell profiles and `~/.bashrc`

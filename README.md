@@ -41,8 +41,6 @@ See [mise-setup.md](mise-setup.md) for the detailed walkthrough and verification
 
 ## Global Machine Setup
 
-Run this once per machine from this repo:
-
 ```powershell
 .\install-dev-tools.ps1
 ```
@@ -64,8 +62,6 @@ rg --version
 delta --version
 gh auth status
 ```
-
-Result: the toolchain is installed and configured globally for your user account. New terminals should have the managed shell integration and globally installed tools available without additional setup in this repo.
 
 ## Project Repo Setup
 
@@ -137,7 +133,7 @@ All tools are installed globally via [mise](https://mise.jdx.dev) and available 
 
 ## Why These Tools
 
-Most developer machines ship with `grep`, `find`, `cat`, and `ls`. They work, but they were designed for a different era. The tools installed here are modern replacements that are faster, safer, and composable — and they make a measurable difference both when you're working alone and when you're working with an AI agent.
+Most developer machines ship with `grep`, `find`, `cat`, and `ls`. The tools installed here are faster, safer, and composable — and make a measurable difference when working with an AI agent.
 
 **Search that stays out of your way**
 
@@ -165,7 +161,7 @@ Config files, API responses, and log output are almost always JSON, YAML, TOML, 
 
 **For AI agents specifically**
 
-All of the above applies when an AI agent is doing the work, but Claude Code and Codex need slightly different global instructions. This repo installs `agent-tools-claude.md` into global `CLAUDE.md` and `agent-tools.md` into global `AGENTS.md` when `-InstallAgentTemplates` is used. Claude Code keeps its built-in file/search/edit workflow, while Codex and generic CLI agents get bounded shell command guidance. The practical result: agents search faster, parse data correctly, make precise code changes, and write shell scripts that pass review — without you having to prompt it each session.
+All of the above applies when an AI agent is doing the work, but Claude Code and Codex need slightly different global instructions. This repo installs `agent-tools-claude.md` into global `CLAUDE.md` and `agent-tools.md` into global `AGENTS.md` when `-InstallAgentTemplates` is used. Claude Code keeps its built-in file/search/edit workflow, while Codex and generic CLI agents get bounded shell command guidance. The practical result: agents search faster, parse data correctly, make precise code changes, and write shell scripts that pass review.
 
 ## Ownership Boundaries
 
@@ -178,4 +174,4 @@ All of the above applies when an AI agent is doing the work, but Claude Code and
 
 ## Re-running
 
-Safe to re-run at any time. Managed shell snippets are recopied, include blocks are only added once, and existing user-owned config is preserved where possible.
+Safe to re-run at any time. Managed shell snippets are recopied, include blocks are only added once, and existing user-owned config is preserved.
