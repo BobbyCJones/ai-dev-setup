@@ -37,6 +37,8 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 
 ## Change tracking
 
+**Branches.** Name branches using the ADO ticket number prefixed with `AB#`: `AB#1234`.
+
 **Commits.** Subject describes the change. Add a body only when context isn't obvious from the diff. One commit per logical change — don't bundle unrelated cleanups, refactors, or docs into a feature commit. If staging is mixed, split before committing. Stage explicit paths or hunks; avoid `git add .` unless the working tree contains only that commit's concern.
 
 **Fork -> upstream PRs.** When the repo has a separate upstream remote (e.g., `Upstream-DWH`):
