@@ -534,7 +534,15 @@ if (-not (Test-CommandAvailable -Name "az")) {
 } else {
     $azExtensions = az extension list --query "[].name" -o tsv 2>$null
     if ($azExtensions -match "azure-devops") {
-        Write-Skip "azure-devops extension already installed"
+        $output = az extension update --name azure-devops --only-show-errors 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Ok "azure-devops extension updated"
+        } else {
+            Write-Fail "azure-devops extension update failed"
+            $output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object {
+                Write-Host "       $_" -ForegroundColor DarkGray
+            }
+        }
     } else {
         $output = az extension add --name azure-devops --only-show-errors 2>&1
         if ($LASTEXITCODE -eq 0) {
