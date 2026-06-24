@@ -34,9 +34,7 @@ All setup steps are idempotent — safe to re-run.
 | `agent-tools.md` | Codex/generic CLI global template content for `AGENTS.md` |
 | `cleanup-dev-tools-config.ps1` | Temporary debug helper for resetting machine config during installer iteration |
 
-The flow: `install-dev-tools.ps1` installs mise if needed → installs a repo-owned global mise fragment under `%APPDATA%\mise\conf.d` → runs `mise install` from this repo → configures git defaults conservatively → copies managed shell snippets to `~/.ai-dev-setup/` → adds one include block to each shell profile. Agent markdown management is opt-in; when requested, the installer creates or updates only its managed blocks in global Claude Code and Codex instruction files.
-
-`cleanup-dev-tools-config.ps1` is a temporary maintenance script for the current debug cycle. Do not treat it as a permanent part of the repo design; delete it once installer behavior has been validated.
+The flow: `install-dev-tools.ps1` installs mise if needed → installs a repo-owned global mise fragment under `%APPDATA%\mise\conf.d` → runs `mise install` from this repo → configures git defaults only when those keys are unset → copies managed shell snippets to `~/.ai-dev-setup/` → adds one include block to each shell profile. With `-InstallAgentTemplates`, it creates or updates its managed blocks in `~/.claude/CLAUDE.md` and `~/AGENTS.md`.
 
 ## Preferred CLI Tools
 
@@ -56,27 +54,11 @@ mise upgrade    # update all tools
 ## Agent Behavior Principles
 
 1. **Make reasonable assumptions and proceed; state them clearly.** Ask only when ambiguity blocks progress. Don't hide confusion. Surface tradeoffs.
-
-2. **Minimum code that solves the problem. Nothing speculative.**
-   Avoid premature abstraction and over-engineering.
-
-3. **Touch only what you must. Clean up only your own mess.**
-   Keep diffs small, reviewable, and trustworthy.
-
+2. **Minimum code that solves the problem. Nothing speculative.** No premature abstraction.
+3. **Touch only what you must. Clean up only your own mess.** Small, reviewable diffs.
 4. **Define success criteria. Loop until verified.**
-   Write tests, check results, and iterate until the goal is demonstrably met.
 
 ## Shell Targets
 
 Scripts must work in Git Bash on Windows. PowerShell variants (`.ps1`) exist for Windows-native contexts. WSL is not required or assumed.
 
-## Writing standards
-
-Apply to all documentation and agent instruction files in this repo:
-
-- **Every word adds value.** Cut ruthlessly.
-- **Active voice, definitive statements.** Avoid: "may," "currently," "designed to," "where possible."
-- **Each fact appears once.** Cross-reference; never repeat.
-- **Simple language, short sentences.** No jargon. One concept per sentence.
-- **No defensive language.** Avoid: "(for now)," "(currently limited)," qualifiers that weaken statements.
-- **Structure for scannability.** Clear headings, short paragraphs.
