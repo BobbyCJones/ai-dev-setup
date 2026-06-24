@@ -1,10 +1,11 @@
 # Agent Guidance
 
-These tools are installed globally via mise. Use them when they extend Claude Code's built-in file, search, and edit tools.
+These tools are installed globally via mise. Use them to extend Claude Code's built-in file, search, and edit tools.
 
 ## Preferred CLI tools
 
-- Search: `sg` (ast-grep) for structural code search when text search is too broad
+- Shell search: `rg` (over `grep`), `fd` (over `find`) — use in Bash commands and scripts; prefer built-in Grep/Glob tools for agent file operations
+- Structural code search: `sg` (ast-grep) when text search is too broad
 - Structured data: `jq` (JSON), `yq` (YAML/TOML/XML), `mlr` (CSV/TSV) — don't parse with `grep`/`sed`/`awk`
 - GitHub: `gh` for PRs, issues, CI, releases (over raw `git` or `curl`)
 - Azure: `az`, plus `az devops`/`pipelines`/`repos`/`boards` from the `azure-devops` extension
@@ -18,6 +19,7 @@ These tools are installed globally via mise. Use them when they extend Claude Co
 Start bounded, expand deliberately. Unbounded tool output wastes context.
 
 - Inspect with `git status --short`, `git diff --name-only`, then targeted `git diff -- <path>`
+- Use `rg -l <pattern>` and `rg -n --max-count 20 <pattern>` to cap matches
 - Use `gh pr list --limit 20 --json number,title,url` over unfiltered dumps
 - `az devops` defaults are pre-configured to `https://dev.azure.com/dwhomes/` / `IS-Aligned` by `install-dev-tools.ps1`; pass `--org` / `--project` only when intentionally working outside them. If `az boards` errors with a missing-org/project message, run `az devops configure --list` to diagnose
 - `az boards query`: bound results with `--query "[0:20].id" -o tsv`; it does not support `--fields`
