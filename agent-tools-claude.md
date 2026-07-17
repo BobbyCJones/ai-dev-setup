@@ -7,7 +7,7 @@ These tools are installed globally via mise. Use them to extend Claude Code's bu
 - Shell search: `rg` (over `grep`), `fd` (over `find`) — use in Bash commands and scripts; prefer built-in Grep/Glob tools for agent file operations
 - Structural code search: `sg` (ast-grep) when text search is too broad
 - Structured data: `jq` (JSON), `yq` (YAML/TOML/XML), `mlr` (CSV/TSV) — don't parse with `grep`/`sed`/`awk`
-- GitHub: `gh` for PRs, issues, CI, releases (over raw `git` or `curl`)
+- GitHub: `gh` for PRs, issues, CI, releases (over raw `git` or `curl`); use the GitHub MCP for interactive browsing, searching, or reading GitHub resources conversationally — `gh` remains the standard for scripts and slash commands
 - SQL Server / Azure SQL: `sqlcmd` (`-Q` ad-hoc, `-i` script files)
 - HTTP / API testing: `curl`
 - Shell scripts: `shellcheck` (resolve warnings or document intentional suppressions), `shfmt -w` (format)
