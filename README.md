@@ -31,12 +31,6 @@ For Cursor: open this folder, launch Composer (`Ctrl+I`), and send the same prom
 .\install-dev-tools.ps1
 ```
 
-The installer configures Azure DevOps CLI defaults for `https://dev.azure.com/dwhomes/` and `IS-Aligned` so `az boards`, `az pipelines`, and `az repos` work from GitHub checkouts. To leave existing Azure DevOps defaults untouched:
-
-```powershell
-.\install-dev-tools.ps1 -SkipAzureDevOpsDefaults
-```
-
 See [mise-setup.md](mise-setup.md) for the detailed walkthrough and verification steps.
 
 ## Global Machine Setup
@@ -123,7 +117,6 @@ All tools are installed globally via [mise](https://mise.jdx.dev) and available 
 | [shellcheck](https://www.shellcheck.net/) | — | Lints shell scripts; catches portability bugs and common mistakes |
 | [shfmt](https://github.com/mvdan/sh) | — | Formats shell scripts consistently |
 | [sqlcmd](https://github.com/microsoft/go-sqlcmd) | — | SQL Server and Azure SQL query runner |
-| [az](https://github.com/Azure/azure-cli) (Azure CLI) | `curl` to Azure APIs | Provision and manage Azure resources from the terminal; includes the `azure-devops` extension |
 | [bat](https://github.com/sharkdp/bat) | `cat` | File display with syntax highlighting and line numbers |
 | [eza](https://github.com/eza-community/eza) | `ls` | Directory listings with git status per file |
 | [fzf](https://github.com/junegunn/fzf) | — | Interactive fuzzy selection from any list |
