@@ -82,7 +82,7 @@ Two MCP servers are required for agent workflows in this setup:
 - **Azure DevOps MCP** — work items, PRs, pipelines, wikis
 - **GitHub MCP** — repository browsing, issues, search
 
-Add both in Claude Code settings: **Settings → MCP Servers**.
+Add both with the Claude Code CLI — see each MCP package's documentation for the exact command and URL. Configuration is stored in `~/.claude/settings.json`.
 
 For the Azure DevOps MCP, you will need a Personal Access Token with `read/write` scopes for Work Items, Code, Build, and Wiki. Create one at `https://dev.azure.com/<your-org>/_usersSettings/tokens`.
 

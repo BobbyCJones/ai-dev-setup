@@ -49,8 +49,6 @@ Apply to all documentation and agent instruction files:
 
 **Commits.** Subject describes the change. Add a body only when context isn't obvious from the diff. One commit per logical change — don't bundle unrelated cleanups, refactors, or docs into a feature commit. If staging is mixed, split before committing. Stage explicit paths or hunks; avoid `git add .` unless the working tree contains only that commit's concern.
 
-**Fork → upstream PRs.** Use `/fork-pr` when the repo has a separate upstream remote.
-
-**PRs.** Use `/fork-pr` for fork→upstream PRs. Include an AI Assistance section (see `/fork-pr` for the template) when you create or contribute to any PR.
+**PRs.** All repos use fork→upstream; use `/fork-pr` for every PR. Include an AI Assistance section (see `/fork-pr` for the template) when you create or contribute to any PR.
 
 **Safety.** No secrets, credentials, tokens, private prompts or private transcripts, or speculative claims. No file-level provenance headers.
