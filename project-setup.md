@@ -75,7 +75,7 @@ export NODE_ENV="development"
 
 ## 3. Per-Project Agent Instructions
 
-For project-specific agent behavior, add an `AGENTS.md` or `CLAUDE.md` to the repo root. The machine setup includes separate starting points for Claude Code and Codex/generic CLI agents — copy the matching file and extend it with project-specific context.
+Add a `CLAUDE.md` to the repo root for Claude Code, or `AGENTS.md` for Codex/generic agents. Start from the global template and add project-specific sections below it.
 
 ```bash
 # Claude Code
@@ -83,9 +83,36 @@ cp /path/to/dev-setup/agent-tools-claude.md ./CLAUDE.md
 
 # Codex / generic CLI agents
 cp /path/to/dev-setup/agent-tools.md ./AGENTS.md
-
-# then add project-specific instructions below the copied template
 ```
+
+Then extend the file with project-specific context. Use this template:
+
+```markdown
+## Project: <name>
+
+<!-- Required: tech stack, so agents don't have to discover it -->
+**Stack:** <language/runtime>, <framework>, <database>
+
+<!-- Required: how to run tests -->
+**Test:** `<command>`
+
+<!-- Required: how to build -->
+**Build:** `<command>`
+
+<!-- Required: entry points and key directories -->
+**Key paths:**
+- `<dir>/` — <purpose>
+- `<dir>/` — <purpose>
+
+<!-- Optional: deployment target and how to deploy -->
+**Deploy:** <environment> — `<command or notes>`
+
+<!-- Optional: anything an agent must not do in this repo -->
+**Constraints:**
+- <constraint>
+```
+
+Fill in every section an agent would otherwise have to discover through exploration. Omit sections that genuinely do not apply.
 
 ### Optional: Azure DevOps Work Item Workflow
 

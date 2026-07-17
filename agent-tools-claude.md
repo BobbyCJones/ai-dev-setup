@@ -51,16 +51,6 @@ Apply to all documentation and agent instruction files:
 
 **Fork → upstream PRs.** Use `/fork-pr` when the repo has a separate upstream remote.
 
-**PRs.** When you create or contribute to a PR, include:
-
-```markdown
-## AI Assistance
-
-- Agent/tool: <name if known>
-- Task: <short request summary>
-- Changes: <main areas changed>
-- Validation: <commands run, or not run with reason>
-- Risks/review focus: <known risks, assumptions, or areas needing attention>
-```
+**PRs.** Use `/fork-pr` for fork→upstream PRs. Include an AI Assistance section (see `/fork-pr` for the template) when you create or contribute to any PR.
 
 **Safety.** No secrets, credentials, tokens, private prompts or private transcripts, or speculative claims. No file-level provenance headers.
