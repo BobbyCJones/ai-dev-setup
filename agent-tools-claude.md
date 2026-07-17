@@ -8,6 +8,7 @@ These tools are installed globally via mise. Use them to extend Claude Code's bu
 - Structural code search: `sg` (ast-grep) when text search is too broad
 - Structured data: `jq` (JSON), `yq` (YAML/TOML/XML), `mlr` (CSV/TSV) — don't parse with `grep`/`sed`/`awk`
 - GitHub: `gh` for PRs, issues, CI, releases (over raw `git` or `curl`); use the GitHub MCP for interactive browsing, searching, or reading GitHub resources conversationally — `gh` remains the standard for scripts and slash commands
+- Azure DevOps: use the ADO MCP (`mcp__azure-devops__*`) for work item lookups, PR review, pipeline status, and general ADO operations; use `/ado-ticket` for the full create-and-link workflow
 - SQL Server / Azure SQL: `sqlcmd` (`-Q` ad-hoc, `-i` script files)
 - HTTP / API testing: `curl`
 - Shell scripts: `shellcheck` (resolve warnings or document intentional suppressions), `shfmt -w` (format)
