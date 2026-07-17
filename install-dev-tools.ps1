@@ -8,7 +8,6 @@
 #   .\install-dev-tools.ps1
 #   .\install-dev-tools.ps1 -Yes
 #   .\install-dev-tools.ps1 -Yes -InstallAgentTemplates
-#   .\install-dev-tools.ps1 -SkipAzureDevOpsDefaults
 #
 # Requirements:
 #   - Windows 10/11 with winget (App Installer)
@@ -20,10 +19,7 @@
 [CmdletBinding()]
 param(
     [switch]$Yes,
-    [switch]$InstallAgentTemplates,
-    [switch]$SkipAzureDevOpsDefaults,
-    [string]$AzureDevOpsOrganization = "https://dev.azure.com/dwhomes/",
-    [string]$AzureDevOpsProject = "IS-Aligned"
+    [switch]$InstallAgentTemplates
 )
 
 Set-StrictMode -Version Latest
@@ -368,28 +364,6 @@ function Install-RequiredModule {
     }
 }
 
-function ConvertTo-AzureDevOpsOrgUrl {
-    param([Parameter(Mandatory = $true)][string]$Organization)
-
-    $trimmed = $Organization.Trim()
-    if ([string]::IsNullOrWhiteSpace($trimmed)) {
-        return ""
-    }
-
-    if ($trimmed -match "^https?://") {
-        if ($trimmed.EndsWith("/")) {
-            return $trimmed
-        }
-        return "$trimmed/"
-    }
-
-    if ($trimmed -match "^[A-Za-z0-9][A-Za-z0-9_-]*$") {
-        return "https://dev.azure.com/$trimmed/"
-    }
-
-    return $trimmed
-}
-
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $managedRoot = Join-Path $env:USERPROFILE ".ai-dev-setup"
 $repoManagedConfigDir = Join-Path $scriptDir "managed-config"
@@ -419,7 +393,6 @@ Write-Host "   * ripgrep, fd       -- fast file and content search" -ForegroundC
 Write-Host "   * jq, yq, mlr       -- JSON, YAML, and CSV processors" -ForegroundColor White
 Write-Host "   * gh                -- GitHub CLI" -ForegroundColor White
 Write-Host "   * sqlcmd            -- SQL Server / Azure SQL query runner" -ForegroundColor White
-Write-Host "   * az                -- Azure CLI (+ azure-devops extension)" -ForegroundColor White
 Write-Host "   * sg (ast-grep)     -- structural code search and replace" -ForegroundColor White
 Write-Host "   * shellcheck, shfmt -- shell script linting and formatting" -ForegroundColor White
 Write-Host "   * bat               -- syntax-highlighted file viewer (cat replacement)" -ForegroundColor White
@@ -434,15 +407,11 @@ Write-Host " CONFIGURE" -ForegroundColor Yellow
 Write-Host "   * Global mise      -> install repo-owned fragment in %APPDATA%\\mise\\conf.d" -ForegroundColor White
 Write-Host "   * User PATH         -- add mise shims so tools work in all apps" -ForegroundColor White
 Write-Host "   * Git global config -- set delta defaults only when unset" -ForegroundColor White
-if ($SkipAzureDevOpsDefaults) {
-    Write-Host "   * Azure DevOps      -- defaults unchanged because -SkipAzureDevOpsDefaults was passed" -ForegroundColor White
-} else {
-    Write-Host "   * Azure DevOps      -- set az devops defaults for $AzureDevOpsOrganization / $AzureDevOpsProject" -ForegroundColor White
-}
 Write-Host "   * Managed snippets  -> %USERPROFILE%\\.ai-dev-setup" -ForegroundColor White
 Write-Host "   * PowerShell / bash -- add one include block that sources those snippets" -ForegroundColor White
+Write-Host "   * Claude skills     -> ~/.claude/commands/ (fork-pr, ado-ticket)" -ForegroundColor White
 if ($InstallAgentTemplates) {
-    Write-Host "   * Agent templates   -- create or update a repo-managed block in ~/.claude/CLAUDE.md and ~/AGENTS.md" -ForegroundColor White
+    Write-Host "   * Agent templates   -- manage ~/.claude/CLAUDE.md and ~/AGENTS.md" -ForegroundColor White
 } else {
     Write-Host "   * Agent templates   -- no global agent files will be modified" -ForegroundColor White
 }
@@ -524,67 +493,6 @@ if (-not (Test-CommandAvailable -Name "mise")) {
     # that were just installed by mise without requiring a new terminal session.
     if ($env:PATH -notlike "*$shimsDir*") {
         $env:PATH = "$shimsDir;$env:PATH"
-    }
-}
-
-Write-Step "Installing Azure CLI extensions"
-
-if (-not (Test-CommandAvailable -Name "az")) {
-    Write-Skip "az not found -- skipping extension installation"
-} else {
-    $azExtensions = az extension list --query "[].name" -o tsv 2>$null
-    if ($azExtensions -match "azure-devops") {
-        $output = az extension update --name azure-devops --only-show-errors 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            Write-Ok "azure-devops extension updated"
-        } else {
-            Write-Fail "azure-devops extension update failed"
-            $output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object {
-                Write-Host "       $_" -ForegroundColor DarkGray
-            }
-        }
-    } else {
-        $output = az extension add --name azure-devops --only-show-errors 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            Write-Ok "azure-devops extension installed"
-        } else {
-            Write-Fail "azure-devops extension install failed"
-            $output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object {
-                Write-Host "       $_" -ForegroundColor DarkGray
-            }
-        }
-    }
-}
-
-Write-Step "Configuring Azure DevOps defaults"
-
-if (-not (Test-CommandAvailable -Name "az")) {
-    Write-Skip "az not found -- skipping Azure DevOps defaults"
-} elseif ($SkipAzureDevOpsDefaults) {
-    Write-Skip "Azure DevOps defaults skipped"
-} else {
-    $normalizedAzureDevOpsOrganization = ConvertTo-AzureDevOpsOrgUrl -Organization $AzureDevOpsOrganization
-    if ([string]::IsNullOrWhiteSpace($normalizedAzureDevOpsOrganization)) {
-        Write-Warn "Azure DevOps organization was not provided; leaving az devops defaults unchanged"
-    } else {
-        $devopsDefaults = @("organization=$normalizedAzureDevOpsOrganization")
-        if (-not [string]::IsNullOrWhiteSpace($AzureDevOpsProject)) {
-            $devopsDefaults += "project=$($AzureDevOpsProject.Trim())"
-        }
-
-        $output = az devops configure --defaults @devopsDefaults 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            if ([string]::IsNullOrWhiteSpace($AzureDevOpsProject)) {
-                Write-Ok "az devops organization default = $normalizedAzureDevOpsOrganization"
-            } else {
-                Write-Ok "az devops defaults = $normalizedAzureDevOpsOrganization / $($AzureDevOpsProject.Trim())"
-            }
-        } else {
-            Write-Fail "az devops defaults update failed"
-            $output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object {
-                Write-Host "       $_" -ForegroundColor DarkGray
-            }
-        }
     }
 }
 
@@ -708,7 +616,7 @@ if (-not $InstallAgentTemplates) {
     )
 
     foreach ($target in $agentTargets) {
-        $agentTemplateContent = Get-Content -LiteralPath $target.Source -Raw
+        $agentTemplateContent = (Get-TextFileState -Path $target.Source).Content
         $managedBlock = @"
 <!-- >>> ai-dev-setup: agent-tools >>> -->
 $agentTemplateContent
@@ -727,6 +635,24 @@ $agentTemplateContent
     Write-Warn "Cursor: open Settings -> Rules for AI and copy the contents of agent-tools.md if desired"
 }
 
+Write-Step "Installing Claude skills"
+
+$skillSourceDir = Join-Path $scriptDir "managed-config\claude\commands"
+$skillDestDir = Join-Path $env:USERPROFILE ".claude\commands"
+
+if (-not (Test-Path -LiteralPath $skillSourceDir)) {
+    Write-Skip "no skills found at $skillSourceDir"
+} else {
+    $skillFiles = @(Get-ChildItem -LiteralPath $skillSourceDir -Filter "*.md")
+    if ($skillFiles.Count -eq 0) {
+        Write-Skip "no .md files in $skillSourceDir"
+    } else {
+        foreach ($skillFile in $skillFiles) {
+            Install-ManagedFile -Source $skillFile.FullName -Destination (Join-Path $skillDestDir $skillFile.Name)
+        }
+    }
+}
+
 Write-Host "`n---------------------------------------------" -ForegroundColor DarkGray
 if ($script:HadFailures) {
     Write-Host " Setup completed with failures." -ForegroundColor Red
@@ -737,6 +663,5 @@ if ($script:HadFailures) {
 }
 Write-Host " Open a new terminal window for all changes to take effect." -ForegroundColor Yellow
 Write-Host " Run 'gh auth login' if you haven't authenticated with GitHub." -ForegroundColor Yellow
-Write-Host " Run 'az login' if you haven't authenticated with Azure." -ForegroundColor Yellow
 Write-Host " Managed shell files live under %USERPROFILE%\\.ai-dev-setup." -ForegroundColor Yellow
 Write-Host "---------------------------------------------`n" -ForegroundColor DarkGray
