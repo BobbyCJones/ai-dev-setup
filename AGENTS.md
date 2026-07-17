@@ -29,6 +29,7 @@ All setup steps are idempotent — safe to re-run.
 | `install-dev-tools.ps1` | PowerShell automation of the machine setup |
 | `mise.toml` | Canonical tool manifest used by `mise install` from this repo |
 | `managed-config/` | Repo-owned mise and shell snippets installed under user config directories |
+| `managed-config/claude/commands/` | Global Claude Code slash commands deployed to `~/.claude/commands/` |
 | `project-setup.md` | Template for per-project `mise.toml`, `.envrc`, and agent instructions |
 | `agent-tools-claude.md` | Claude Code-specific global template content for `CLAUDE.md` |
 | `agent-tools.md` | Codex/generic CLI global template content for `AGENTS.md` |

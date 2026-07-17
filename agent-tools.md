@@ -7,7 +7,6 @@ These tools are installed globally via mise. Use them instead of POSIX defaults.
 - Search / discovery (respect `.gitignore`): `rg` (over `grep`), `fd` (over `find`), `sg` (ast-grep) for structural code search when text search is too broad
 - Structured data: `jq` (JSON), `yq` (YAML/TOML/XML), `mlr` (CSV/TSV) — don't parse with `grep`/`sed`/`awk`
 - GitHub: `gh` for PRs, issues, CI, releases (over raw `git` or `curl`)
-- Azure: `az`, plus `az devops`/`pipelines`/`repos`/`boards` from the `azure-devops` extension
 - SQL Server / Azure SQL: `sqlcmd` (`-Q` ad-hoc, `-i` script files)
 - HTTP / API testing: `curl`
 - Shell scripts: `shellcheck` (resolve warnings or document intentional suppressions), `shfmt -w` (format)
@@ -20,10 +19,6 @@ Start bounded, expand deliberately. Unbounded tool output wastes context.
 - Inspect with `git status --short`, `git diff --name-only`, then targeted `git diff -- <path>`
 - Use `rg -l <pattern>` and `rg -n --max-count 20 <pattern>` to cap matches
 - Use `gh pr list --limit 20 --json number,title,url` over unfiltered dumps
-- `az devops` defaults are pre-configured to `https://dev.azure.com/dwhomes/` / `IS-Aligned` by `install-dev-tools.ps1`; pass `--org` / `--project` only when intentionally working outside them. If `az boards` errors with a missing-org/project message, run `az devops configure --list` to diagnose
-- `az boards query`: bound results with `--query "[0:20].id" -o tsv`; it does not support `--fields`
-- `az boards work-item show`: use `--fields` only with `--expand none`, e.g. `az boards work-item show --id <id> --expand none --fields System.Id,System.Title`, or pipe full output to `jq`
-- `az boards work-item relation add --relation-type`: use the **friendly name** (`"Parent"`, `"Child"`) not the reference name (`System.LinkTypes.Hierarchy-Reverse`). Run `az boards work-item relation list-type` to discover available names.
 - Read only the files needed for the task
 
 ## Behavior principles
