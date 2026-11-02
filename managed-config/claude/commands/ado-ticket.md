@@ -1,6 +1,6 @@
 ---
 description: Create an Azure DevOps child work item under an existing parent work item
-allowed-tools: [mcp__azure-devops__wit_get_work_item, mcp__azure-devops__wit_create_work_item, mcp__azure-devops__wit_update_work_item, mcp__azure-devops__wit_work_items_link, Bash]
+allowed-tools: [mcp__azure-devops__wit_work_item, mcp__azure-devops__wit_work_item_write, mcp__azure-devops__wit_work_item_link_write, Bash]
 ---
 
 # Azure DevOps: Create Child Work Item
@@ -11,7 +11,7 @@ If no ID appears above, ask for it before starting.
 
 ## Step 1: Inspect parent
 
-Use `wit_get_work_item` with the parent ID and `fields`:
+Use `wit_work_item` with `action: "get"`, the parent `id`, and `fields`:
 `["System.Id", "System.Title", "System.WorkItemType", "System.AreaPath", "System.IterationPath", "System.AssignedTo", "Microsoft.VSTS.Common.Priority"]`
 
 `System.AssignedTo` is an object — extract `uniqueName` for use as the assignee. If null or empty, omit assignee from the create call.
@@ -44,7 +44,7 @@ Present all drafts to the user and ask them to confirm, edit, or replace. Do not
 
 ## Step 3: Create the child work item
 
-Use `wit_create_work_item` with `workItemType` and a `fields` array. Every field — including title, area path, priority, and assignee — is a `{name, value}` object in that array. HTML fields also require `format: "Html"`.
+Use `wit_work_item_write` with `action: "create"`, `workItemType`, and a `fields` array. Every field — including title, area path, priority, and assignee — is a `{name, value}` object in that array. HTML fields also require `format: "Html"`.
 
 Required fields:
 - `{name: "System.Title", value: "<approved title>"}`
@@ -59,12 +59,12 @@ If assignee is not empty:
 For User Story and Bug only — do not set this field for any other type:
 - `{name: "Microsoft.VSTS.Common.AcceptanceCriteria", value: "<div><ul><li>Criterion one.</li></ul></div>", format: "Html"}`
 
-If any field could not be set during creation, use `wit_update_work_item` with JSON Patch format:
+If any field could not be set during creation, use `wit_work_item_write` with `action: "update"`, the child `id`, and JSON Patch `updates`:
 `updates: [{path: "/fields/System.Description", value: "<div>...</div>", op: "add"}]`
 
 ## Step 4: Link to parent
 
-Use `wit_work_items_link` to establish a Parent/Child relationship:
+Use `wit_work_item_link_write` with `action: "link"` to establish a Parent/Child relationship:
 
 ```
 updates: [{id: <CHILD_ID>, linkToId: <PARENT_ID>, type: "parent"}]
@@ -72,7 +72,7 @@ updates: [{id: <CHILD_ID>, linkToId: <PARENT_ID>, type: "parent"}]
 
 ## Step 5: Verify and report
 
-Use `wit_get_work_item` with `expand: "relations"` to confirm the parent relation is present. Report the child ID, title, and edit URL:
+Use `wit_work_item` with `action: "get"` and `expand: "Relations"` to confirm the parent relation is present. Report the child ID, title, and edit URL:
 
 `https://dev.azure.com/dwhomes/IS-Aligned/_workitems/edit/<CHILD_ID>`
 
