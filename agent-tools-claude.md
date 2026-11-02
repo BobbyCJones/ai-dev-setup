@@ -4,7 +4,7 @@ These tools are installed globally via mise. Use them to extend Claude Code's bu
 
 ## Preferred CLI tools
 
-- Shell search: `rg` (over `grep`), `fd` (over `find`) — use in Bash commands and scripts; prefer built-in Grep/Glob tools for agent file operations
+- Shell search: `rg` (over `grep`), `fd` (over `find`) — use in Bash commands and scripts; prefer built-in Grep/Glob tools for agent file operations. Bash denies `grep` and `find` outright.
 - Structural code search: `sg` (ast-grep) when text search is too broad
 - Structured data: `jq` (JSON), `yq` (YAML/TOML/XML), `mlr` (CSV/TSV) — don't parse with `grep`/`sed`/`awk`
 - GitHub: `gh` for PRs, issues, CI, releases (over raw `git` or `curl`); use the GitHub MCP for interactive browsing, searching, or reading GitHub resources conversationally — `gh` remains the standard for scripts and slash commands
@@ -17,6 +17,10 @@ These tools are installed globally via mise. Use them to extend Claude Code's bu
 ## Inspecting unfamiliar .NET assembly APIs
 
 Don't use `Assembly.LoadFrom`, `Add-Type`, or throwaway `dotnet run` probes to reflect on NuGet DLLs — the sandbox blocks loading and executing arbitrary assemblies. Write the call with a best-guess signature in the real project and run `dotnet build`. Roslyn's CS1061/CS1503/CS7036 diagnostics name the real member, parameter types, and order. Fall back to a raw byte/text scan of the DLL only when the method name itself is unknown.
+
+## Windows paths
+
+Bash treats backslashes as escapes: `C:\GitHub\foo` becomes `C:GitHubfoo`, and file operations create stray directories. In Bash, write paths as `/c/GitHub/foo`. For file-system operations, prefer the PowerShell tool.
 
 ## Where to run scripts
 
