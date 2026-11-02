@@ -2,7 +2,11 @@
 # The installer copies this file to $HOME/.ai-dev-setup/bash/
 # and ~/.bashrc sources it via a single include block.
 
-if command -v mise >/dev/null 2>&1; then
+# `mise activate bash` mis-splits Windows-style PATH entries under Git
+# Bash/MSYS (each "C:\..." becomes a stray "C" plus the real path),
+# corrupting PATH. Shims (already added to PATH by the installer) cover
+# version switching there, so skip activation on MSYS/Cygwin.
+if [ -z "${MSYSTEM:-}" ] && command -v mise >/dev/null 2>&1; then
     eval "$(mise activate bash)"
 fi
 
