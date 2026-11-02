@@ -100,6 +100,7 @@ See [project-setup.md](project-setup.md) for the fuller per-project template and
 | [project-setup.md](project-setup.md) | What to add to each project repo |
 | [agent-tools-claude.md](agent-tools-claude.md) | Claude Code-specific template for global `CLAUDE.md` instructions |
 | [agent-tools.md](agent-tools.md) | Codex/generic CLI template for global `AGENTS.md` instructions |
+| [managed-config/claude/settings-deny.json](managed-config/claude/settings-deny.json) | Deny rules merged into `~/.claude/settings.json` |
 
 ## Installed Tools
 
@@ -164,6 +165,7 @@ All of the above applies when an AI agent is doing the work, but Claude Code and
 - This setup **does** add one include block to PowerShell profiles and `~/.bashrc`.
 - This setup **does not** overwrite `%APPDATA%\mise\config.toml`.
 - This setup **does not** overwrite user content in `~/.claude/CLAUDE.md` or `~/AGENTS.md`; with `-InstallAgentTemplates`, it creates or updates only the repo-managed blocks.
+- With `-InstallAgentTemplates`, this setup merges deny rules for `grep`/`find` into `~/.claude/settings.json`, preserving all other existing permissions.
 
 ## Re-running
 

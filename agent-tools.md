@@ -12,6 +12,14 @@ These tools are installed globally via mise. Use them instead of POSIX defaults.
 - Shell scripts: `shellcheck` (resolve warnings or document intentional suppressions), `shfmt -w` (format)
 - `direnv` — do **not** modify `.envrc` without explicit instruction
 
+## Inspecting unfamiliar .NET assembly APIs
+
+Don't use `Assembly.LoadFrom`, `Add-Type`, or throwaway `dotnet run` probes to reflect on NuGet DLLs — the sandbox blocks loading and executing arbitrary assemblies. Write the call with a best-guess signature in the real project and run `dotnet build`. Roslyn's CS1061/CS1503/CS7036 diagnostics name the real member, parameter types, and order. Fall back to a raw byte/text scan of the DLL only when the method name itself is unknown.
+
+## Where to run scripts
+
+Build, test, and run scripts only under `C:\GitHub`, worktrees included. Never use an agent's temp or scratch directory (for example `AppData\Local\Temp\...`), even when the tool names it for temp files. ThreatLocker blocked scripts and built test binaries under `AppData\Local\Temp\claude\...`, and the user confirmed that `C:\GitHub` runs. Put throwaway scripts and scratch builds in `C:\GitHub\.scratch`.
+
 ## Context budget
 
 Start bounded, expand deliberately. Unbounded tool output wastes context.

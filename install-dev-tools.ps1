@@ -248,6 +248,65 @@ function Install-ManagedFile {
     }
 }
 
+function Merge-ClaudeSettingsDenyRules {
+    param(
+        [Parameter(Mandatory = $true)][string]$SettingsPath,
+        [Parameter(Mandatory = $true)][string]$FragmentPath
+    )
+
+    if (-not (Test-Path -LiteralPath $FragmentPath)) {
+        Write-Fail "Managed settings fragment not found: $FragmentPath"
+        return
+    }
+
+    $denyRules = @((Get-Content -LiteralPath $FragmentPath -Raw | ConvertFrom-Json).permissions.deny)
+
+    Ensure-FileExists -Path $SettingsPath
+    $raw = (Get-TextFileState -Path $SettingsPath).Content
+
+    if ([string]::IsNullOrWhiteSpace($raw)) {
+        $settings = [pscustomobject]@{}
+    } else {
+        try {
+            $settings = $raw | ConvertFrom-Json
+        } catch {
+            Write-Fail "Could not parse '$SettingsPath' as JSON: $($_.Exception.Message)"
+            return
+        }
+    }
+
+    if ($settings.PSObject.Properties.Name -notcontains "permissions") {
+        $settings | Add-Member -MemberType NoteProperty -Name "permissions" -Value ([pscustomobject]@{})
+    }
+    if ($settings.permissions.PSObject.Properties.Name -notcontains "deny") {
+        $settings.permissions | Add-Member -MemberType NoteProperty -Name "deny" -Value @()
+    }
+
+    $existingDeny = @($settings.permissions.deny)
+    $added = @()
+    foreach ($rule in $denyRules) {
+        if ($existingDeny -notcontains $rule) {
+            $existingDeny += $rule
+            $added += $rule
+        }
+    }
+
+    if ($added.Count -eq 0) {
+        Write-Skip "Claude settings.json deny rules already current"
+        return
+    }
+
+    $settings.permissions.deny = $existingDeny
+    $json = $settings | ConvertTo-Json -Depth 20
+    try {
+        Write-TextFile -Path $SettingsPath -Content $json -Encoding ([System.Text.UTF8Encoding]::new($false))
+    } catch {
+        Write-Fail "Could not update '$SettingsPath': $($_.Exception.Message)"
+        return
+    }
+    Write-Ok "Claude settings.json deny rules added: $($added -join ', ')"
+}
+
 function Get-GitConfigValue {
     param([Parameter(Mandatory = $true)][string]$Key)
     $value = git config --global $Key 2>$null
@@ -376,6 +435,7 @@ $managedPowerShellTarget = Join-Path $managedRoot "powershell\dev-tools-profile.
 $managedBashTarget = Join-Path $managedRoot "bash\dev-tools.bash"
 $agentTemplateSource = Join-Path $scriptDir "agent-tools.md"
 $agentClaudeTemplateSource = Join-Path $scriptDir "agent-tools-claude.md"
+$claudeSettingsDenySource = Join-Path $repoManagedConfigDir "claude\settings-deny.json"
 
 function Get-MiseConfigDir {
     return Join-Path $env:APPDATA "mise"
@@ -412,6 +472,7 @@ Write-Host "   * PowerShell / bash -- add one include block that sources those s
 Write-Host "   * Claude skills     -> ~/.claude/commands/ (fork-pr, ado-ticket)" -ForegroundColor White
 if ($InstallAgentTemplates) {
     Write-Host "   * Agent templates   -- manage ~/.claude/CLAUDE.md and ~/AGENTS.md" -ForegroundColor White
+    Write-Host "   * Claude settings   -- deny grep/find in ~/.claude/settings.json (forces rg/fd)" -ForegroundColor White
 } else {
     Write-Host "   * Agent templates   -- no global agent files will be modified" -ForegroundColor White
 }
@@ -633,6 +694,9 @@ $agentTemplateContent
     }
 
     Write-Warn "Cursor: open Settings -> Rules for AI and copy the contents of agent-tools.md if desired"
+
+    $claudeSettingsPath = Join-Path $env:USERPROFILE ".claude\settings.json"
+    Merge-ClaudeSettingsDenyRules -SettingsPath $claudeSettingsPath -FragmentPath $claudeSettingsDenySource
 }
 
 Write-Step "Installing Claude skills"
