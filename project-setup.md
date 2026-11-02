@@ -20,7 +20,7 @@ python = "3.12"
 ruby   = "3.3"
 ```
 
-When a developer enters the directory, mise automatically switches to these versions (if `mise activate` is in their shell profile, which the machine setup handles).
+In PowerShell, `mise activate` switches versions when you enter the directory. In Git Bash, the machine setup skips `mise activate` and relies on shims, which resolve versions per directory. Project `[env]` values do not load in Git Bash; use `.envrc` for those.
 
 **Common runtimes:**
 
@@ -75,17 +75,9 @@ export NODE_ENV="development"
 
 ## 3. Per-Project Agent Instructions
 
-Add a `CLAUDE.md` to the repo root for Claude Code, or `AGENTS.md` for Codex/generic agents. Start from the global template and add project-specific sections below it.
+Add `AGENTS.md` to the repo root for project-specific context. Add a `CLAUDE.md` containing `See [AGENTS.md](AGENTS.md).` so Claude Code reads it too.
 
-```bash
-# Claude Code
-cp /path/to/dev-setup/agent-tools-claude.md ./CLAUDE.md
-
-# Codex / generic CLI agents
-cp /path/to/dev-setup/agent-tools.md ./AGENTS.md
-```
-
-Then extend the file with project-specific context. Use this template:
+Do not copy the global templates into a project. Agents already load them from `~/.claude/CLAUDE.md` and `~/AGENTS.md`, so a copy duplicates them. Include only what is specific to the project:
 
 ```markdown
 ## Project: <name>

@@ -1,65 +1,61 @@
 # AGENTS.md
 
-This file provides guidance to AI coding agents (Claude Code, Codex, Cursor, etc.) when working with code in this repository.
+Guidance for AI coding agents (Claude Code, Codex, Cursor) working in this repository.
 
 ## What This Repo Is
 
-A developer environment setup toolkit for Windows machines. It standardizes a CLI toolchain and shell activation for agent-assisted development. There are no build steps, tests, or lint commands — this repo contains scripts and documentation, not an application.
+A Windows developer-environment toolkit. It installs a CLI toolchain with mise, wires shell activation, and deploys global agent instructions. It contains scripts and docs only: no build, test, or lint commands.
 
-## Setup
+User-facing setup lives in [README.md](README.md). This file covers maintenance.
 
-Run the machine setup once per machine:
+## Layout
 
-```bash
-# Agent-assisted (recommended) — prompt any agent:
-# "Read the README.md and set up my dev environment following the instructions"
-
-# Manual
-.\install-dev-tools.ps1
-```
-
-All setup steps are idempotent — safe to re-run.
-
-## Architecture
-
-| File/Dir | Purpose |
+| Path | Purpose |
 |---|---|
-| `README.md` | Top-level setup entry point and ownership boundaries |
-| `mise-setup.md` | Primary setup guide and verification steps |
-| `install-dev-tools.ps1` | PowerShell automation of the machine setup |
-| `mise.toml` | Canonical tool manifest used by `mise install` from this repo |
-| `managed-config/` | Repo-owned mise and shell snippets installed under user config directories |
-| `managed-config/claude/commands/` | Global Claude Code slash commands deployed to `~/.claude/commands/` |
-| `project-setup.md` | Template for per-project `mise.toml`, `.envrc`, and agent instructions |
-| `agent-tools-claude.md` | Claude Code-specific global template content for `CLAUDE.md` |
-| `agent-tools.md` | Codex/generic CLI global template content for `AGENTS.md` |
-| `cleanup-dev-tools-config.ps1` | Temporary debug helper for resetting machine config during installer iteration |
+| `README.md` | Setup entry point, tool list, ownership boundaries |
+| `mise-setup.md` | Step-by-step setup and verification |
+| `project-setup.md` | Per-project `mise.toml`, `.envrc`, and agent file guidance |
+| `install-dev-tools.ps1` | Idempotent installer (`-Yes`, `-InstallAgentTemplates`) |
+| `install-dev-tools.bat` | Double-click wrapper; always passes `-InstallAgentTemplates` |
+| `mise.toml` | Tool manifest used by `mise install` from this repo |
+| `managed-config/mise/ai-dev-setup-tools.toml` | Copy of `mise.toml`, installed to `%APPDATA%\mise\conf.d` |
+| `managed-config/powershell/`, `managed-config/bash/` | Shell snippets copied to `~/.ai-dev-setup/` |
+| `managed-config/claude/commands/` | Slash commands copied to `~/.claude/commands/` |
+| `managed-config/claude/settings-deny.json` | Deny rules merged into `~/.claude/settings.json` |
+| `agent-tools-claude.md` | Source for the managed block in `~/.claude/CLAUDE.md` |
+| `agent-tools.md` | Source for the managed block in `~/AGENTS.md` |
+| `agent-runtime-test.md` | Prompt an agent runs to verify tools and instruction files |
 
-The flow: `install-dev-tools.ps1` installs mise if needed → installs a repo-owned global mise fragment under `%APPDATA%\mise\conf.d` → runs `mise install` from this repo → configures git defaults only when those keys are unset → copies managed shell snippets to `~/.ai-dev-setup/` → adds one include block to each shell profile. With `-InstallAgentTemplates`, it creates or updates its managed blocks in `~/.claude/CLAUDE.md` and `~/AGENTS.md`.
+## Installer Flow
 
-## Preferred CLI Tools
+1. Install mise via winget if missing.
+2. Copy the mise fragment to `conf.d`, run `mise install` here, add mise shims to the User `PATH`.
+3. Set delta-related git config keys only when unset.
+4. Install `PSReadLine` and `Terminal-Icons`.
+5. Copy shell snippets and add one include block to each PowerShell profile and `~/.bashrc`.
+6. With `-InstallAgentTemplates`: update the managed blocks in the two global agent files and merge deny rules.
+7. Copy `managed-config/claude/commands/*.md` to `~/.claude/commands/`.
 
-These are installed globally and should be used instead of their fallbacks:
+## Maintenance Rules
 
-- **rg** over `grep` — respects `.gitignore`
-- **fd** over `find`
-- **jq** for JSON, **yq** for YAML/TOML/XML — never parse structured data with grep/sed/awk
-- **gh** for all GitHub operations (PRs, issues, CI)
-- **fzf** when user selection from a list is needed
+- Keep `mise.toml` and `managed-config/mise/ai-dev-setup-tools.toml` identical. Edit both in one commit.
+- The two `agent-tools*.md` templates share most content. Change shared sections in both; keep Claude-only (MCP, `/ado-ticket`, `/fork-pr`) and Codex-only (inline fork-PR steps) sections in their own file.
+- Template changes reach machines only after re-running the installer with `-InstallAgentTemplates`.
+- The installer replaces content between its marker comments. Never document edits to text inside a managed block as durable.
+- New tools go in `mise.toml`, the fragment, the installer banner, and the README tool table.
+- New files under `managed-config/claude/commands/` deploy automatically.
+- Scripts run in Git Bash and PowerShell. WSL is not assumed.
+- The bash snippet skips `mise activate` under MSYS because it corrupts `PATH`; shims provide version switching there.
+- Run `shellcheck` and `shfmt -w` on any shell script you change.
 
-```bash
-mise list       # see installed tools and versions
-mise upgrade    # update all tools
-```
+## Verification
 
-## Agent Behavior Principles
+No automated tests exist. After installer or template changes:
 
-1. **Make reasonable assumptions and proceed; state them clearly.** Ask only when ambiguity blocks progress. Don't hide confusion. Surface tradeoffs.
-2. **Minimum code that solves the problem. Nothing speculative.** No premature abstraction.
-3. **Touch only what you must. Clean up only your own mess.** Small, reviewable diffs.
-4. **Define success criteria. Loop until verified.**
+1. Run `.\install-dev-tools.ps1 -Yes -InstallAgentTemplates` twice. On the second run, every managed file and block must report `[--]`.
+2. Open a new shell and run `mise list`.
+3. Run the check in [agent-runtime-test.md](agent-runtime-test.md) from outside this repo.
 
-## Shell Targets
+## Writing Standards
 
-Scripts must work in Git Bash on Windows. PowerShell variants (`.ps1`) exist for Windows-native contexts. WSL is not required or assumed.
-
+Defined in the agent templates under "Writing standards". Apply them to every doc here.

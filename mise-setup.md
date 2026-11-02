@@ -53,17 +53,7 @@ Optional flags:
 
 Or double-click `install-dev-tools.bat`.
 
-The script handles everything else:
-
-- Installs a repo-owned global mise fragment under `%APPDATA%\mise\conf.d`
-- Runs `mise install` from this repo to install the toolset declared in [mise.toml](mise.toml)
-- Adds `%LOCALAPPDATA%\mise\shims` to your user `PATH` if needed
-- Configures git to use delta defaults only when those keys are unset
-- Installs `PSReadLine` and `Terminal-Icons` in `CurrentUser` scope
-- Copies repo-managed shell snippets to `~/.ai-dev-setup/`
-- Adds one include block to PowerShell profiles and `~/.bashrc`
-- Optionally creates or updates repo-managed blocks in `~/.claude/CLAUDE.md` and `~/AGENTS.md`
-- Uses `agent-tools-claude.md` for Claude Code and `agent-tools.md` for Codex/generic CLI agents
+The steps it performs are listed in [README.md](README.md#global-machine-setup). It uses `agent-tools-claude.md` for Claude Code and `agent-tools.md` for Codex/generic CLI agents.
 
 ### 3. Open a new terminal
 
@@ -82,11 +72,11 @@ Two MCP servers are required for agent workflows in this setup:
 - **Azure DevOps MCP** — work items, PRs, pipelines, wikis
 - **GitHub MCP** — repository browsing, issues, search
 
-Add both with the Claude Code CLI — see each MCP package's documentation for the exact command and URL. Configuration is stored in `~/.claude/settings.json`.
+Add both with `claude mcp add` — see each MCP package's documentation for the exact command and URL. Verify with `claude mcp list`.
 
 For the Azure DevOps MCP, you will need a Personal Access Token with `read/write` scopes for Work Items, Code, Build, and Wiki. Create one at `https://dev.azure.com/<your-org>/_usersSettings/tokens`.
 
-Once configured, agents will use these MCPs automatically — no CLI fallback needed for ADO or GitHub operations.
+Once configured, agents use the ADO MCP for ADO operations and the GitHub MCP for interactive GitHub browsing. Scripts and slash commands use `gh`.
 
 ### 6. Verify
 
@@ -104,85 +94,8 @@ Get-ChildItem $HOME\.ai-dev-setup -Recurse
 Get-ChildItem $env:APPDATA\mise\conf.d
 ```
 
-## Ownership Boundaries
+## Reference
 
-This repo owns:
-
-- [mise.toml](mise.toml) as the tool manifest
-- The files in [managed-config/](managed-config)
-- The repo-owned global mise fragment under `%APPDATA%\mise\conf.d`
-- The copied managed shell snippets under `~/.ai-dev-setup/`
-- The include blocks it adds to PowerShell profiles and `~/.bashrc`
-
-This repo does not overwrite:
-
-- `%APPDATA%\mise\config.toml`
-- User content in `~/.claude/CLAUDE.md`; with `-InstallAgentTemplates`, only the repo-managed block is created or updated
-- User content in `~/AGENTS.md`; with `-InstallAgentTemplates`, only the repo-managed block is created or updated
-- Existing git config values that differ from the repo's suggested defaults
-
-## Tool Reference
-
-Tools ordered by impact for agent-assisted development.
-
-### Tier 1 — Essential
-
-These tools are directly used by agents or unlock core capabilities.
-
-#### `ripgrep` (rg)
-
-Fast code search across a codebase. Claude Code uses ripgrep internally for all file content searches. Significantly faster than `grep` and respects `.gitignore` automatically.
-
-#### `fd`
-
-Fast, user-friendly alternative to `find`. Agents use it to discover files by name or pattern. Simpler syntax, respects `.gitignore`, handles Unicode paths.
-
-#### `jq`
-
-JSON processor for the command line. Agents use this constantly — parsing API responses, reading `package.json`, manipulating config files. Without it, agents resort to fragile text parsing.
-
-#### `gh` (GitHub CLI)
-
-GitHub operations from the terminal. Agents use this to create PRs, comment on issues, check CI status, and manage branches without leaving the terminal.
-
-### Tier 2 — High Value
-
-These tools improve how agents and developers work together.
-
-#### `bat`
-
-Syntax-highlighted `cat` with line numbers and paging. Makes file output readable when reviewing agent changes.
-
-#### `delta`
-
-Syntax-highlighted git diffs with side-by-side view. Makes reviewing agent commits and diffs significantly easier.
-
-#### `fzf`
-
-Interactive fuzzy finder. Lets agents build selection menus that hand off a single decision to the developer. Also enhances shell history search (`Ctrl+R`).
-
-#### `yq`
-
-Like `jq` but for YAML, TOML, and XML. Agents use it to edit CI pipelines, Kubernetes manifests, and Docker Compose files without brittle line-based editing.
-
-#### `sqlcmd`
-
-Microsoft's SQL Server CLI. Run queries against SQL Server or Azure SQL from the terminal. Agents use it to inspect schemas, run migrations, and validate data without needing SSMS or a GUI.
-
-### Tier 3 — Quality of Life
-
-#### `zoxide`
-
-A smarter `cd` that learns your most-visited directories. Jump anywhere with a partial name (`z scratch`, `z myproject`).
-
-#### `eza`
-
-A modern replacement for `ls` with color, icons, and git status per file. Helps orient in a directory after agent changes.
-
-#### `tldr`
-
-Simplified man pages with practical examples. Quickly look up any CLI tool an agent suggests (`tldr delta`, `tldr jq`).
-
-#### `direnv`
-
-Auto-loads environment variables when entering a directory. Keeps project-specific API keys and secrets isolated. See [project-setup.md](project-setup.md) for usage.
+- Ownership boundaries: [README.md](README.md#ownership-boundaries)
+- Installed tools: [README.md](README.md#installed-tools)
+- Per-project setup: [project-setup.md](project-setup.md)

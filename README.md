@@ -28,25 +28,27 @@ For Cursor: open this folder, launch Composer (`Ctrl+I`), and send the same prom
 **Manual:**
 
 ```powershell
-.\install-dev-tools.ps1
+.\install-dev-tools.ps1                               # prompts before changing anything
+.\install-dev-tools.ps1 -Yes -InstallAgentTemplates   # unattended, includes global agent files
 ```
+
+`install-dev-tools.bat` runs the installer with `-InstallAgentTemplates`.
 
 See [mise-setup.md](mise-setup.md) for the detailed walkthrough and verification steps.
 
 ## Global Machine Setup
 
-```powershell
-.\install-dev-tools.ps1
-```
-
 What the installer does globally:
 
 1. Installs `mise` if it is not already present.
-2. Installs the CLI tools declared in [mise.toml](mise.toml) so they are available in any terminal.
-3. Installs a repo-owned global mise fragment under `%APPDATA%\\mise\\conf.d`.
-4. Copies managed shell snippets to `%USERPROFILE%\\.ai-dev-setup`.
+2. Installs the CLI tools declared in [mise.toml](mise.toml) so they are available in any terminal, and adds the mise shims directory to the User `PATH`.
+3. Installs a repo-owned global mise fragment under `%APPDATA%\mise\conf.d`.
+4. Copies managed shell snippets to `%USERPROFILE%\.ai-dev-setup`.
 5. Adds one include block to PowerShell profiles and `~/.bashrc` so shell activation works automatically.
-6. Configures conservative global git defaults, including `delta` for syntax-highlighted diffs when available.
+6. Sets `delta` git defaults for any keys not already set.
+7. Installs the `PSReadLine` and `Terminal-Icons` PowerShell modules.
+8. Copies the slash commands `/fork-pr` and `/ado-ticket` to `~/.claude/commands/`.
+9. With `-InstallAgentTemplates`: manages blocks in `~/.claude/CLAUDE.md` and `~/AGENTS.md`, and merges `grep`/`find` deny rules into `~/.claude/settings.json`.
 
 After installation, open a new shell and verify:
 
@@ -100,7 +102,10 @@ See [project-setup.md](project-setup.md) for the fuller per-project template and
 | [project-setup.md](project-setup.md) | What to add to each project repo |
 | [agent-tools-claude.md](agent-tools-claude.md) | Claude Code-specific template for global `CLAUDE.md` instructions |
 | [agent-tools.md](agent-tools.md) | Codex/generic CLI template for global `AGENTS.md` instructions |
+| [managed-config/claude/commands/](managed-config/claude/commands) | `/fork-pr` and `/ado-ticket` slash commands |
 | [managed-config/claude/settings-deny.json](managed-config/claude/settings-deny.json) | Deny rules merged into `~/.claude/settings.json` |
+| [agent-runtime-test.md](agent-runtime-test.md) | Prompt that verifies agents see the tools and instructions |
+| [AGENTS.md](AGENTS.md) | Maintenance guide for this repo |
 
 ## Installed Tools
 
@@ -118,6 +123,7 @@ All tools are installed globally via [mise](https://mise.jdx.dev) and available 
 | [shellcheck](https://www.shellcheck.net/) | — | Lints shell scripts; catches portability bugs and common mistakes |
 | [shfmt](https://github.com/mvdan/sh) | — | Formats shell scripts consistently |
 | [sqlcmd](https://github.com/microsoft/go-sqlcmd) | — | SQL Server and Azure SQL query runner |
+| [tlrc](https://github.com/tldr-pages/tlrc) | `man` | Short, example-driven command help (`tldr`) |
 | [bat](https://github.com/sharkdp/bat) | `cat` | File display with syntax highlighting and line numbers |
 | [eza](https://github.com/eza-community/eza) | `ls` | Directory listings with git status per file |
 | [fzf](https://github.com/junegunn/fzf) | — | Interactive fuzzy selection from any list |
@@ -163,10 +169,11 @@ All of the above applies when an AI agent is doing the work, but Claude Code and
 - This setup **does** install a repo-owned global mise fragment under `%APPDATA%\mise\conf.d`.
 - This setup **does** install repo-managed shell snippets under `%USERPROFILE%\.ai-dev-setup`.
 - This setup **does** add one include block to PowerShell profiles and `~/.bashrc`.
+- This setup **does** copy slash commands into `~/.claude/commands/`, overwriting files with the same names.
 - This setup **does not** overwrite `%APPDATA%\mise\config.toml`.
 - This setup **does not** overwrite user content in `~/.claude/CLAUDE.md` or `~/AGENTS.md`; with `-InstallAgentTemplates`, it creates or updates only the repo-managed blocks.
 - With `-InstallAgentTemplates`, this setup merges deny rules for `grep`/`find` into `~/.claude/settings.json`, preserving all other existing permissions.
 
 ## Re-running
 
-Safe to re-run at any time. Managed shell snippets are recopied, include blocks are only added once, and existing user-owned config is preserved.
+Safe to re-run at any time. Managed files are recopied only when they differ, include blocks are only added once, managed agent blocks are refreshed in place, and existing user-owned config is preserved. Re-run with `-InstallAgentTemplates` after pulling template changes.
