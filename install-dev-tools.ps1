@@ -469,7 +469,7 @@ Write-Host "   * User PATH         -- add mise shims so tools work in all apps" 
 Write-Host "   * Git global config -- set delta defaults only when unset" -ForegroundColor White
 Write-Host "   * Managed snippets  -> %USERPROFILE%\\.ai-dev-setup" -ForegroundColor White
 Write-Host "   * PowerShell / bash -- add one include block that sources those snippets" -ForegroundColor White
-Write-Host "   * Claude skills     -> ~/.claude/commands/ (fork-pr, ado-ticket)" -ForegroundColor White
+Write-Host "   * Claude commands   -> ~/.claude/commands/ (fork-pr, ado-ticket)" -ForegroundColor White
 if ($InstallAgentTemplates) {
     Write-Host "   * Agent templates   -- manage ~/.claude/CLAUDE.md and ~/AGENTS.md" -ForegroundColor White
     Write-Host "   * Claude settings   -- deny grep/find in ~/.claude/settings.json (forces rg/fd)" -ForegroundColor White
@@ -693,13 +693,13 @@ $agentTemplateContent
         }
     }
 
-    Write-Warn "Cursor: open Settings -> Rules for AI and copy the contents of agent-tools.md if desired"
+    Write-Skip "Cursor: copy the contents of agent-tools.md into Settings -> Rules for AI if desired"
 
     $claudeSettingsPath = Join-Path $env:USERPROFILE ".claude\settings.json"
     Merge-ClaudeSettingsDenyRules -SettingsPath $claudeSettingsPath -FragmentPath $claudeSettingsDenySource
 }
 
-Write-Step "Installing Claude skills"
+Write-Step "Installing Claude commands"
 
 $skillSourceDir = Join-Path $scriptDir "managed-config\claude\commands"
 $skillDestDir = Join-Path $env:USERPROFILE ".claude\commands"
