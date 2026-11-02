@@ -18,7 +18,7 @@ Don't use `Assembly.LoadFrom`, `Add-Type`, or throwaway `dotnet run` probes to r
 
 ## Where to run scripts
 
-Build, test, and run scripts only under `C:\GitHub`, worktrees included. Never use the Claude session scratchpad (`AppData\Local\Temp\claude\...`), even when the harness names it for temp files. ThreatLocker blocked scripts and built test binaries there, and the machine owner confirmed that `C:\GitHub` runs. Put throwaway scripts and scratch builds in `C:\GitHub\.scratch`.
+Build, test, and run scripts only under `C:\GitHub`, worktrees included. Never use an agent's temp or scratch directory (for example `AppData\Local\Temp\...`), even when the tool names it for temp files. ThreatLocker blocked scripts and built test binaries under `AppData\Local\Temp\claude\...`, and the machine owner confirmed that `C:\GitHub` runs. Put throwaway scripts and scratch builds in `C:\GitHub\.scratch`.
 
 ## Context budget
 
