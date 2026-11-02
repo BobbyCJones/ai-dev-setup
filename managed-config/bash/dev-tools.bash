@@ -5,7 +5,9 @@
 # `mise activate bash` mis-splits Windows-style PATH entries under Git
 # Bash/MSYS (each "C:\..." becomes a stray "C" plus the real path),
 # corrupting PATH. Shims (already added to PATH by the installer) cover
-# version switching there, so skip activation on MSYS/Cygwin.
+# version switching there, so skip activation on MSYS/Cygwin. Skipping
+# also drops per-project `[env]` values and PATH changes on `cd`; use
+# direnv for those in Git Bash.
 if [ -z "${MSYSTEM:-}" ] && command -v mise >/dev/null 2>&1; then
     eval "$(mise activate bash)"
 fi
