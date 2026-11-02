@@ -100,7 +100,7 @@ See [project-setup.md](project-setup.md) for the fuller per-project template and
 | [project-setup.md](project-setup.md) | What to add to each project repo |
 | [agent-tools-claude.md](agent-tools-claude.md) | Claude Code-specific template for global `CLAUDE.md` instructions |
 | [agent-tools.md](agent-tools.md) | Codex/generic CLI template for global `AGENTS.md` instructions |
-| [managed-config/claude/settings-deny.json](managed-config/claude/settings-deny.json) | Deny rules merged into `~/.claude/settings.json` blocking `grep`/`find` in favor of `rg`/`fd` |
+| [managed-config/claude/settings-deny.json](managed-config/claude/settings-deny.json) | Deny rules merged into `~/.claude/settings.json` |
 
 ## Installed Tools
 

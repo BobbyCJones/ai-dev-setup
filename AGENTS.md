@@ -43,7 +43,6 @@ These are installed globally and should be used instead of their fallbacks:
 
 - **rg** over `grep` — respects `.gitignore`
 - **fd** over `find`
-- On Claude Code, `-InstallAgentTemplates` hard-denies `grep`/`find` in `~/.claude/settings.json`, so this is enforced, not just a preference
 - **jq** for JSON, **yq** for YAML/TOML/XML — never parse structured data with grep/sed/awk
 - **gh** for all GitHub operations (PRs, issues, CI)
 - **fzf** when user selection from a list is needed
