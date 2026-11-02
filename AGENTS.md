@@ -17,32 +17,30 @@ User-facing setup lives in [README.md](README.md). This file covers maintenance.
 | `project-setup.md` | Per-project `mise.toml`, `.envrc`, and agent file guidance |
 | `install-dev-tools.ps1` | Idempotent installer (`-Yes`, `-InstallAgentTemplates`) |
 | `install-dev-tools.bat` | Double-click wrapper; always passes `-InstallAgentTemplates` |
-| `mise.toml` | Tool manifest used by `mise install` from this repo |
-| `managed-config/mise/ai-dev-setup-tools.toml` | Copy of `mise.toml`, installed to `%APPDATA%\mise\conf.d` |
+| `mise.toml` | Tool manifest; also installed as `%APPDATA%\mise\conf.d\ai-dev-setup-tools.toml` |
 | `managed-config/powershell/`, `managed-config/bash/` | Shell snippets copied to `~/.ai-dev-setup/` |
 | `managed-config/claude/commands/` | Slash commands copied to `~/.claude/commands/` |
-| `managed-config/claude/settings-deny.json` | Deny rules merged into `~/.claude/settings.json` |
+| `managed-config/claude/settings-permissions.json` | Allow and deny rules merged into `~/.claude/settings.json` |
 | `agent-tools-claude.md` | Source for the managed block in `~/.claude/CLAUDE.md` |
-| `agent-tools.md` | Source for the managed block in `~/AGENTS.md` |
+| `agent-tools.md` | Source for the managed block in `~/.codex/AGENTS.md` |
 | `agent-runtime-test.md` | Prompt an agent runs to verify tools and instruction files |
 
 ## Installer Flow
 
 1. Install mise via winget if missing.
-2. Copy the mise fragment to `conf.d`, run `mise install` here, add mise shims to the User `PATH`.
+2. Copy `mise.toml` to `conf.d` as the global fragment, run `mise install` here, add mise shims to the User `PATH`.
 3. Set delta-related git config keys only when unset.
 4. Install `PSReadLine` and `Terminal-Icons`.
 5. Copy shell snippets and add one include block to each PowerShell profile and `~/.bashrc`.
-6. With `-InstallAgentTemplates`: update the managed blocks in the two global agent files and merge deny rules.
+6. With `-InstallAgentTemplates`: update the managed blocks in the two global agent files and merge permission rules.
 7. Copy `managed-config/claude/commands/*.md` to `~/.claude/commands/`.
 
 ## Maintenance Rules
 
-- Keep `mise.toml` and `managed-config/mise/ai-dev-setup-tools.toml` identical. Edit both in one commit.
 - The two `agent-tools*.md` templates share most content. Change shared sections in both; keep Claude-only (MCP, `/ado-ticket`, `/fork-pr`) and Codex-only (inline fork-PR steps) sections in their own file.
 - Template changes reach machines only after re-running the installer with `-InstallAgentTemplates`.
 - The installer replaces content between its marker comments. Never document edits to text inside a managed block as durable.
-- New tools go in `mise.toml`, the fragment, the installer banner, and the README tool table.
+- New tools go in `mise.toml`, the installer banner, the README tool table, and an allow rule in `settings-permissions.json` when agents should run them unprompted.
 - New files under `managed-config/claude/commands/` deploy automatically.
 - Scripts run in Git Bash and PowerShell. WSL is not assumed.
 - The bash snippet skips `mise activate` under MSYS because it corrupts `PATH`; shims provide version switching there.

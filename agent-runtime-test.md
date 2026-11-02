@@ -38,7 +38,7 @@ where gh
 5. Inspect the relevant global instruction file for the current agent:
 
 - Claude Code: `%USERPROFILE%\.claude\CLAUDE.md`
-- Codex: `%USERPROFILE%\AGENTS.md`
+- Codex: `%USERPROFILE%\.codex\AGENTS.md` (or `%CODEX_HOME%\AGENTS.md`)
 
 6. Report whether that file contains guidance to prefer these tools:
 

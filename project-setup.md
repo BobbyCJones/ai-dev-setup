@@ -77,7 +77,7 @@ export NODE_ENV="development"
 
 Add `AGENTS.md` to the repo root for project-specific context. Add a `CLAUDE.md` containing `See [AGENTS.md](AGENTS.md).` so Claude Code reads it too.
 
-Do not copy the global templates into a project. Agents already load them from `~/.claude/CLAUDE.md` and `~/AGENTS.md`, so a copy duplicates them. Include only what is specific to the project:
+Do not copy the global templates into a project. Agents already load them from `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`, so a copy duplicates them. Include only what is specific to the project:
 
 ```markdown
 ## Project: <name>

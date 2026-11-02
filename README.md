@@ -48,7 +48,7 @@ What the installer does globally:
 6. Sets `delta` git defaults for any keys not already set.
 7. Installs the `PSReadLine` and `Terminal-Icons` PowerShell modules.
 8. Copies the slash commands `/fork-pr` and `/ado-ticket` to `~/.claude/commands/`.
-9. With `-InstallAgentTemplates`: manages blocks in `~/.claude/CLAUDE.md` and `~/AGENTS.md`, and merges `grep`/`find` deny rules into `~/.claude/settings.json`.
+9. With `-InstallAgentTemplates`: manages blocks in `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`, and merges allow and deny rules into `~/.claude/settings.json`.
 
 After installation, open a new shell and verify:
 
@@ -101,9 +101,9 @@ See [project-setup.md](project-setup.md) for the fuller per-project template and
 | [mise-setup.md](mise-setup.md) | Machine setup guide and verification steps |
 | [project-setup.md](project-setup.md) | What to add to each project repo |
 | [agent-tools-claude.md](agent-tools-claude.md) | Claude Code-specific template for global `CLAUDE.md` instructions |
-| [agent-tools.md](agent-tools.md) | Codex/generic CLI template for global `AGENTS.md` instructions |
+| [agent-tools.md](agent-tools.md) | Codex/generic CLI template for global `~/.codex/AGENTS.md` instructions |
 | [managed-config/claude/commands/](managed-config/claude/commands) | `/fork-pr` and `/ado-ticket` slash commands |
-| [managed-config/claude/settings-deny.json](managed-config/claude/settings-deny.json) | Deny rules merged into `~/.claude/settings.json` |
+| [managed-config/claude/settings-permissions.json](managed-config/claude/settings-permissions.json) | Allow and deny rules merged into `~/.claude/settings.json` |
 | [agent-runtime-test.md](agent-runtime-test.md) | Prompt that verifies agents see the tools and instructions |
 | [AGENTS.md](AGENTS.md) | Maintenance guide for this repo |
 
@@ -161,7 +161,7 @@ Config files, API responses, and log output are almost always JSON, YAML, TOML, 
 
 **For AI agents specifically**
 
-All of the above applies when an AI agent is doing the work, but Claude Code and Codex need slightly different global instructions. This repo installs `agent-tools-claude.md` into global `CLAUDE.md` and `agent-tools.md` into global `AGENTS.md` when `-InstallAgentTemplates` is used. Claude Code keeps its built-in file/search/edit workflow, while Codex and generic CLI agents get bounded shell command guidance. The practical result: agents search faster, parse data correctly, make precise code changes, and write shell scripts that pass review.
+All of the above applies when an AI agent is doing the work, but Claude Code and Codex need slightly different global instructions. This repo installs `agent-tools-claude.md` into global `CLAUDE.md` and `agent-tools.md` into `~/.codex/AGENTS.md` when `-InstallAgentTemplates` is used. Claude Code keeps its built-in file/search/edit workflow, while Codex and generic CLI agents get bounded shell command guidance. The practical result: agents search faster, parse data correctly, make precise code changes, and write shell scripts that pass review.
 
 ## Ownership Boundaries
 
@@ -171,8 +171,8 @@ All of the above applies when an AI agent is doing the work, but Claude Code and
 - This setup **does** add one include block to PowerShell profiles and `~/.bashrc`.
 - This setup **does** copy slash commands into `~/.claude/commands/`, overwriting files with the same names.
 - This setup **does not** overwrite `%APPDATA%\mise\config.toml`.
-- This setup **does not** overwrite user content in `~/.claude/CLAUDE.md` or `~/AGENTS.md`; with `-InstallAgentTemplates`, it creates or updates only the repo-managed blocks.
-- With `-InstallAgentTemplates`, this setup merges deny rules for `grep`/`find` into `~/.claude/settings.json`, preserving all other existing permissions.
+- This setup **does not** overwrite user content in `~/.claude/CLAUDE.md` or `~/.codex/AGENTS.md`; with `-InstallAgentTemplates`, it creates or updates only the repo-managed blocks.
+- With `-InstallAgentTemplates`, this setup merges allow rules for the installed tools and deny rules for `grep` and `find` into `~/.claude/settings.json`, preserving all other existing permissions.
 
 ## Re-running
 

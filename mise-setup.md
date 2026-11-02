@@ -8,7 +8,7 @@ Installs universal CLI tools via [mise](https://mise.jdx.dev), configures git de
 
 Repo-managed sources:
 
-- mise fragment source: [managed-config/mise/ai-dev-setup-tools.toml](managed-config/mise/ai-dev-setup-tools.toml)
+- mise fragment source: [mise.toml](mise.toml), installed unchanged
 - PowerShell snippet source: [managed-config/powershell/dev-tools-profile.ps1](managed-config/powershell/dev-tools-profile.ps1)
 - Bash snippet source: [managed-config/bash/dev-tools.bash](managed-config/bash/dev-tools.bash)
 
@@ -67,16 +67,15 @@ gh auth login
 
 ### 5. Configure MCP servers in Claude Code
 
-Two MCP servers are required for agent workflows in this setup:
+The Azure DevOps MCP is required for ADO work items, PRs, pipelines, and wikis (`/ado-ticket` depends on it):
 
-- **Azure DevOps MCP** — work items, PRs, pipelines, wikis
-- **GitHub MCP** — repository browsing, issues, search
+```bash
+claude mcp add azure-devops -- npx -y @azure-devops/mcp <your-org>
+```
 
-Add both with `claude mcp add` — see each MCP package's documentation for the exact command and URL. Verify with `claude mcp list`.
+The server signs you in with a Microsoft account on first use. Verify with `claude mcp list`.
 
-For the Azure DevOps MCP, you will need a Personal Access Token with `read/write` scopes for Work Items, Code, Build, and Wiki. Create one at `https://dev.azure.com/<your-org>/_usersSettings/tokens`.
-
-Once configured, agents use the ADO MCP for ADO operations and the GitHub MCP for interactive GitHub browsing. Scripts and slash commands use `gh`.
+The GitHub MCP is optional. When configured, agents use it for interactive GitHub browsing. Scripts and slash commands use `gh`.
 
 ### 6. Verify
 

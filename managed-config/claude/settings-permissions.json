@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sg *)",
+      "Bash(mlr *)",
+      "Bash(shellcheck *)",
+      "Bash(shfmt *)",
+      "Bash(mise list*)",
+      "Bash(mise ls*)",
+      "Bash(mise install*)"
+    ],
+    "deny": [
+      "Bash(grep *)",
+      "Bash(find *)"
+    ]
+  }
+}

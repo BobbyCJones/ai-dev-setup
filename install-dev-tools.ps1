@@ -248,7 +248,7 @@ function Install-ManagedFile {
     }
 }
 
-function Merge-ClaudeSettingsDenyRules {
+function Merge-ClaudeSettingsPermissions {
     param(
         [Parameter(Mandatory = $true)][string]$SettingsPath,
         [Parameter(Mandatory = $true)][string]$FragmentPath
@@ -259,7 +259,7 @@ function Merge-ClaudeSettingsDenyRules {
         return
     }
 
-    $denyRules = @((Get-Content -LiteralPath $FragmentPath -Raw | ConvertFrom-Json).permissions.deny)
+    $fragment = (Get-Content -LiteralPath $FragmentPath -Raw | ConvertFrom-Json).permissions
 
     Ensure-FileExists -Path $SettingsPath
     $raw = (Get-TextFileState -Path $SettingsPath).Content
@@ -278,25 +278,28 @@ function Merge-ClaudeSettingsDenyRules {
     if ($settings.PSObject.Properties.Name -notcontains "permissions") {
         $settings | Add-Member -MemberType NoteProperty -Name "permissions" -Value ([pscustomobject]@{})
     }
-    if ($settings.permissions.PSObject.Properties.Name -notcontains "deny") {
-        $settings.permissions | Add-Member -MemberType NoteProperty -Name "deny" -Value @()
-    }
 
-    $existingDeny = @($settings.permissions.deny)
     $added = @()
-    foreach ($rule in $denyRules) {
-        if ($existingDeny -notcontains $rule) {
-            $existingDeny += $rule
-            $added += $rule
+    foreach ($kind in @("allow", "deny")) {
+        $rules = @($fragment.$kind)
+        if ($settings.permissions.PSObject.Properties.Name -notcontains $kind) {
+            $settings.permissions | Add-Member -MemberType NoteProperty -Name $kind -Value @()
         }
+        $existing = @($settings.permissions.$kind)
+        foreach ($rule in $rules) {
+            if ($existing -notcontains $rule) {
+                $existing += $rule
+                $added += "$kind`: $rule"
+            }
+        }
+        $settings.permissions.$kind = $existing
     }
 
     if ($added.Count -eq 0) {
-        Write-Skip "Claude settings.json deny rules already current"
+        Write-Skip "Claude settings.json permission rules already current"
         return
     }
 
-    $settings.permissions.deny = $existingDeny
     $json = $settings | ConvertTo-Json -Depth 20
     try {
         Write-TextFile -Path $SettingsPath -Content $json -Encoding ([System.Text.UTF8Encoding]::new($false))
@@ -304,7 +307,7 @@ function Merge-ClaudeSettingsDenyRules {
         Write-Fail "Could not update '$SettingsPath': $($_.Exception.Message)"
         return
     }
-    Write-Ok "Claude settings.json deny rules added: $($added -join ', ')"
+    Write-Ok "Claude settings.json permission rules added: $($added -join ', ')"
 }
 
 function Get-GitConfigValue {
@@ -430,12 +433,13 @@ $miseManagedFragmentName = "ai-dev-setup-tools.toml"
 
 $managedPowerShellSource = Join-Path $repoManagedConfigDir "powershell\dev-tools-profile.ps1"
 $managedBashSource = Join-Path $repoManagedConfigDir "bash\dev-tools.bash"
-$managedMiseFragmentSource = Join-Path $repoManagedConfigDir "mise\$miseManagedFragmentName"
+$managedMiseFragmentSource = Join-Path $scriptDir "mise.toml"
 $managedPowerShellTarget = Join-Path $managedRoot "powershell\dev-tools-profile.ps1"
 $managedBashTarget = Join-Path $managedRoot "bash\dev-tools.bash"
 $agentTemplateSource = Join-Path $scriptDir "agent-tools.md"
 $agentClaudeTemplateSource = Join-Path $scriptDir "agent-tools-claude.md"
-$claudeSettingsDenySource = Join-Path $repoManagedConfigDir "claude\settings-deny.json"
+$codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE ".codex" }
+$claudeSettingsPermissionsSource = Join-Path $repoManagedConfigDir "claude\settings-permissions.json"
 
 function Get-MiseConfigDir {
     return Join-Path $env:APPDATA "mise"
@@ -471,8 +475,8 @@ Write-Host "   * Managed snippets  -> %USERPROFILE%\\.ai-dev-setup" -ForegroundC
 Write-Host "   * PowerShell / bash -- add one include block that sources those snippets" -ForegroundColor White
 Write-Host "   * Claude commands   -> ~/.claude/commands/ (fork-pr, ado-ticket)" -ForegroundColor White
 if ($InstallAgentTemplates) {
-    Write-Host "   * Agent templates   -- manage ~/.claude/CLAUDE.md and ~/AGENTS.md" -ForegroundColor White
-    Write-Host "   * Claude settings   -- deny grep/find in ~/.claude/settings.json (forces rg/fd)" -ForegroundColor White
+    Write-Host "   * Agent templates   -- manage ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md" -ForegroundColor White
+    Write-Host "   * Claude settings   -- merge allow/deny rules into ~/.claude/settings.json (denies grep/find; forces rg/fd)" -ForegroundColor White
 } else {
     Write-Host "   * Agent templates   -- no global agent files will be modified" -ForegroundColor White
 }
@@ -665,7 +669,7 @@ Write-Step "Handling agent templates"
 
 if (-not $InstallAgentTemplates) {
     Write-Skip "agent templates not requested"
-    Write-Host "       Use agent-tools-claude.md for ~/.claude/CLAUDE.md and agent-tools.md for ~/AGENTS.md" -ForegroundColor DarkGray
+    Write-Host "       Use agent-tools-claude.md for ~/.claude/CLAUDE.md and agent-tools.md for ~/.codex/AGENTS.md" -ForegroundColor DarkGray
 } elseif (-not (Test-Path -LiteralPath $agentTemplateSource)) {
     Write-Fail "agent-tools.md not found at $agentTemplateSource"
 } elseif (-not (Test-Path -LiteralPath $agentClaudeTemplateSource)) {
@@ -673,7 +677,7 @@ if (-not $InstallAgentTemplates) {
 } else {
     $agentTargets = @(
         [pscustomobject]@{ Path = (Join-Path $env:USERPROFILE ".claude\CLAUDE.md"); Label = "Claude template"; Source = $agentClaudeTemplateSource }
-        [pscustomobject]@{ Path = (Join-Path $env:USERPROFILE "AGENTS.md"); Label = "Codex template"; Source = $agentTemplateSource }
+        [pscustomobject]@{ Path = (Join-Path $codexHome "AGENTS.md"); Label = "Codex template"; Source = $agentTemplateSource }
     )
 
     foreach ($target in $agentTargets) {
@@ -693,10 +697,14 @@ $agentTemplateContent
         }
     }
 
+    if (Test-Path -LiteralPath (Join-Path $codexHome "AGENTS.override.md")) {
+        Write-Warn "Codex reads AGENTS.override.md before AGENTS.md; the managed block in $codexHome\AGENTS.md is ignored while that file exists"
+    }
+
     Write-Skip "Cursor: copy the contents of agent-tools.md into Settings -> Rules for AI if desired"
 
     $claudeSettingsPath = Join-Path $env:USERPROFILE ".claude\settings.json"
-    Merge-ClaudeSettingsDenyRules -SettingsPath $claudeSettingsPath -FragmentPath $claudeSettingsDenySource
+    Merge-ClaudeSettingsPermissions -SettingsPath $claudeSettingsPath -FragmentPath $claudeSettingsPermissionsSource
 }
 
 Write-Step "Installing Claude commands"
