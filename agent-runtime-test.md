@@ -11,7 +11,7 @@ Confirm that:
 
 - Claude Code can access `rg`, `jq`, and `gh`
 - Codex can access `rg`, `jq`, and `gh`
-- the agent can see instruction content telling it to prefer `rg`, `fd`, `jq`, `yq`, `gh`, `bat`, `eza`, and `fzf`
+- the agent can see instruction content telling it to prefer `rg`, `fd`, `jq`, `yq`, `mlr`, `sg`, and `gh`
 
 The test must be run from a directory outside this repo so it validates machine-wide availability rather than repo-local behavior.
 
@@ -46,10 +46,9 @@ where gh
 - `fd` over `find`
 - `jq` for JSON
 - `yq` for YAML/TOML/XML
+- `mlr` for CSV/TSV
+- `sg` for structural code search
 - `gh` for GitHub operations
-- `bat` over `cat`
-- `eza` over `ls`
-- `fzf` for user selection from a list
 
 7. Run one real tool-usage check:
 
