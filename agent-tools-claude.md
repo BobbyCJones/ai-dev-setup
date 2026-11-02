@@ -7,7 +7,7 @@ These tools are installed globally via mise. Use them to extend Claude Code's bu
 - Shell search: `rg` (over `grep`), `fd` (over `find`) — use in Bash commands and scripts; prefer built-in Grep/Glob tools for agent file operations. Bash denies `grep` and `find` outright.
 - Structural code search: `sg` (ast-grep) when text search is too broad
 - Structured data: `jq` (JSON), `yq` (YAML/TOML/XML), `mlr` (CSV/TSV) — don't parse with `grep`/`sed`/`awk`
-- GitHub: `gh` for PRs, issues, CI, releases (over raw `git` or `curl`); use the GitHub MCP for interactive browsing, searching, or reading GitHub resources conversationally — `gh` remains the standard for scripts and slash commands
+- GitHub: `gh` for PRs, issues, CI, releases (over raw `git` or `curl`); when a GitHub MCP is configured, use it for interactive browsing, searching, or reading GitHub resources; `gh` remains the standard for scripts and slash commands
 - Azure DevOps: use the ADO MCP (`mcp__azure-devops__*`) for work item lookups, PR review, pipeline status, and general ADO operations; use `/ado-ticket` for the full create-and-link workflow
 - SQL Server / Azure SQL: `sqlcmd` (`-Q` ad-hoc, `-i` script files)
 - HTTP / API testing: `curl`
@@ -20,7 +20,7 @@ Don't use `Assembly.LoadFrom`, `Add-Type`, or throwaway `dotnet run` probes to r
 
 ## Windows paths
 
-Bash treats backslashes as escapes: `C:\GitHub\foo` becomes `C:GitHubfoo`, and file operations create stray directories. In Bash, write paths as `/c/GitHub/foo`. For file-system operations, prefer the PowerShell tool.
+Bash treats backslashes as escapes: `C:\GitHub\foo` becomes `C:GitHubfoo`, and file operations create stray directories. In Bash, write paths as `/c/GitHub/foo`. For file-system operations, prefer the PowerShell tool when it is available.
 
 ## Where to run scripts
 
@@ -61,6 +61,6 @@ Apply to all documentation and agent instruction files:
 
 **Commits.** Subject describes the change. Add a body only when context isn't obvious from the diff. One commit per logical change — don't bundle unrelated cleanups, refactors, or docs into a feature commit. If staging is mixed, split before committing. Stage explicit paths or hunks; avoid `git add .` unless the working tree contains only that commit's concern.
 
-**PRs.** All repos use fork→upstream; use `/fork-pr` for every PR. Include an AI Assistance section (see `/fork-pr` for the template) when you create or contribute to any PR.
+**PRs.** When the repo has a separate upstream remote, use `/fork-pr`; otherwise use `gh pr create`. Include an AI Assistance section (see `/fork-pr` for the template) when you create or contribute to any PR.
 
 **Safety.** No secrets, credentials, tokens, private prompts or private transcripts, or speculative claims. No file-level provenance headers.

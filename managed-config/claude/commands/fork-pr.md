@@ -17,6 +17,8 @@ allowed-tools: [Bash]
 
 Identify the upstream remote — any remote that is not `origin`. Parse its URL to extract `OWNER/REPO`.
 
+If none exists, stop: the repo has no upstream. Tell the user to open the PR with `gh pr create`.
+
 If exactly one non-origin remote exists, use it. If multiple exist, list them and ask the user to pick one.
 
 Get the default branch:
